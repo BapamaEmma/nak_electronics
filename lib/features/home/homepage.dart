@@ -1,7 +1,9 @@
 // ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:nak_electronics/features/home/sections/categories.dart';
+import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/features/home/sections/brands.dart';
 import 'package:nak_electronics/features/home/sections/new_arrivals.dart';
 import 'package:nak_electronics/features/home/sections/featured_products.dart';
@@ -504,28 +506,51 @@ class _NavMenu extends StatelessWidget {
       children: [
         ...navItems,
         // Cart icon
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Stack(
-            children: [
-              const Icon(
-                Icons.shopping_cart_outlined,
-                size: 30,
-                color: Colors.black87,
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Colors.redAccent,
-                    shape: BoxShape.circle,
+        Consumer<CartService>(
+          builder: (context, cart, child) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 30,
+                    color: Colors.black87,
                   ),
+                  onPressed: () {
+                    // TODO: Navigate to cart page
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Cart: ${cart.totalQuantity} items'),
+                      ),
+                    );
+                  },
                 ),
-              ),
-            ],
+                if (cart.totalQuantity > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: const BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          cart.totalQuantity.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         // SignUp button

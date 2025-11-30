@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nak_electronics/models/product.dart';
+import 'package:nak_electronics/features/product/product_detail_page.dart';
 
 class NewArrivalsSection extends StatefulWidget {
   const NewArrivalsSection({super.key});
@@ -17,137 +19,166 @@ class _NewArrivalsSectionState extends State<NewArrivalsSection> {
       id: '1',
       name: 'Gibson SG Standard Coffee Colour Limited Edition',
       price: 2500.00,
-      originalPrice: 3000.00,
-      imagePath: 'assets/images/gibsonsg.png',
+      image: 'assets/images/gibsonsg.png',
+      category: 'Guitars & Bass',
+      brand: 'Gibson',
+      description: 'Limited edition Gibson SG guitar',
       isNew: true,
-      discount: 17,
+      discount: 0.17,
     ),
     Product(
       id: '2',
       name: 'MG 16-Channel Mixer Available In Stock',
       price: 1500.00,
-      originalPrice: 1800.00,
-      imagePath: 'assets/images/MG mixer.png',
+      image: 'assets/images/MG mixer.png',
+      category: 'Mixers',
+      brand: 'Yamaha',
+      description: '16-channel mixer',
       isNew: true,
-      discount: 17,
+      discount: 0.17,
     ),
     Product(
       id: '3',
       name: 'JBL SRX828SP Double 18" Subwoofer Speaker',
       price: 15000.00,
-      originalPrice: 12000.00,
-      imagePath: 'assets/images/jblsub.png',
+      image: 'assets/images/jblsub.png',
+      category: 'PA System & Live Sound',
+      brand: 'JBL',
+      description: 'Double 18" subwoofer',
       isNew: true,
-      discount: 16,
+      discount: 0.16,
     ),
     Product(
       id: '4',
       name: 'Fender Player Stratocaster',
       price: 2800.00,
-      originalPrice: 3200.00,
-      imagePath: 'assets/images/fender player.png',
+      image: 'assets/images/fender player.png',
+      category: 'Guitars & Bass',
+      brand: 'Fender',
+      description: 'Player Stratocaster guitar',
       isNew: true,
-      discount: 13,
+      discount: 0.13,
     ),
     Product(
       id: '5',
       name: 'Studio Headphones Pro Monitoring',
       price: 750.00,
-      originalPrice: 900.00,
-      imagePath: 'assets/images/headset.png',
+      image: 'assets/images/headset.png',
+      category: 'Headphones',
+      brand: 'Generic',
+      description: 'Pro monitoring headphones',
       isNew: true,
-      discount: 17,
+      discount: 0.17,
     ),
     Product(
       id: '6',
       name: 'Condenser Microphone with XLR',
       price: 980.00,
-      originalPrice: 1200.00,
-      imagePath: 'assets/images/microphone.png',
+      image: 'assets/images/microphone.png',
+      category: 'Microphones',
+      brand: 'Generic',
+      description: 'Condenser mic with XLR',
       isNew: true,
-      discount: 18,
+      discount: 0.18,
     ),
     Product(
       id: '7',
       name: 'Compact Audio Interface 2x2',
       price: 1100.00,
-      originalPrice: 1300.00,
-      imagePath: 'assets/images/recording.png',
+      image: 'assets/images/recording.png',
+      category: 'Recording Gear',
+      brand: 'Generic',
+      description: '2x2 audio interface',
       isNew: true,
-      discount: 15,
+      discount: 0.15,
     ),
     Product(
       id: '8',
       name: 'Studio Monitor Speaker Pair',
       price: 2200.00,
-      originalPrice: 2600.00,
-      imagePath: 'assets/images/monitor.png',
+      image: 'assets/images/monitor.png',
+      category: 'Studio Monitors',
+      brand: 'Generic',
+      description: 'Pair of studio monitors',
       isNew: true,
-      discount: 15,
+      discount: 0.15,
     ),
     Product(
       id: '9',
       name: 'Professional Stage Mixer 12-Channel',
       price: 3500.00,
-      originalPrice: 3999.00,
-      imagePath: 'assets/images/mixer.png',
+      image: 'assets/images/mixer.png',
+      category: 'Mixers',
+      brand: 'Generic',
+      description: '12-channel stage mixer',
       isNew: true,
-      discount: 12,
+      discount: 0.12,
     ),
     Product(
       id: '10',
       name: 'High-Power Guitar Amplifier 100W',
       price: 1950.00,
-      originalPrice: 2200.00,
-      imagePath: 'assets/images/amp.png',
+      image: 'assets/images/amp.png',
+      category: 'Amplifiers',
+      brand: 'Generic',
+      description: '100W guitar amp',
       isNew: true,
-      discount: 11,
+      discount: 0.11,
     ),
     Product(
       id: '11',
       name: 'Electric Bass Guitar 5-String',
       price: 2750.00,
-      originalPrice: 3100.00,
-      imagePath: 'assets/images/guitar.png',
+      image: 'assets/images/guitar.png',
+      category: 'Guitars & Bass',
+      brand: 'Generic',
+      description: '5-string bass guitar',
       isNew: true,
-      discount: 11,
+      discount: 0.11,
     ),
     Product(
       id: '12',
       name: 'Pearl Drum Kit 5-Piece',
       price: 9000.00,
-      originalPrice: 11000.00,
-      imagePath: 'assets/images/drums.png',
+      image: 'assets/images/drums.png',
+      category: 'Drums & Percussion',
+      brand: 'Pearl',
+      description: '5-piece drum kit',
       isNew: true,
-      discount: 8,
+      discount: 0.08,
     ),
     Product(
       id: '13',
       name: '61-Key Portable Keyboard',
       price: 1600.00,
-      originalPrice: 1850.00,
-      imagePath: 'assets/images/keyboard.png',
+      image: 'assets/images/keyboard.png',
+      category: 'Keyboard',
+      brand: 'Generic',
+      description: '61-key portable keyboard',
       isNew: true,
-      discount: 14,
+      discount: 0.14,
     ),
-
     Product(
       id: '14',
       name: 'LED Stage Lighting Pack',
       price: 1300.00,
-      originalPrice: 1500.00,
-      imagePath: 'assets/images/lighting.png',
+      image: 'assets/images/lighting.png',
+      category: 'Lighting & Effect',
+      brand: 'Generic',
+      description: 'LED stage lighting pack',
       isNew: true,
-      discount: 13,
+      discount: 0.13,
     ),
     Product(
-      id: '14',
+      id: '15',
       name: 'DLX-D4(2 in 1)Microphone',
       price: 2300.00,
-      originalPrice: 2500.00,
-      imagePath: 'assets/images/DLX-D4.png',
+      image: 'assets/images/DLX-D4.png',
+      category: 'Microphones',
+      brand: 'Generic',
+      description: '2-in-1 microphone',
       isNew: true,
-      discount: 15,
+      discount: 0.15,
     ),
   ];
 
@@ -220,7 +251,18 @@ class _NewArrivalsSectionState extends State<NewArrivalsSection> {
                             padding: const EdgeInsets.symmetric(horizontal: 18),
                             child: SizedBox(
                               width: 220,
-                              child: ProductCard(product: product),
+                              child: ProductCard(
+                                product: product,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProductDetailPage(product: product),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           );
                         }).toList(),
@@ -325,30 +367,11 @@ class _NewArrivalsSectionState extends State<NewArrivalsSection> {
   }
 }
 
-class Product {
-  final String id;
-  final String name;
-  final double price;
-  final double? originalPrice;
-  final String imagePath;
-  final bool isNew;
-  final int? discount;
-
-  Product({
-    required this.id,
-    required this.name,
-    required this.price,
-    this.originalPrice,
-    required this.imagePath,
-    this.isNew = false,
-    this.discount,
-  });
-}
-
 class ProductCard extends StatefulWidget {
   final Product product;
+  final VoidCallback? onTap;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.product, this.onTap});
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -359,123 +382,126 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.08),
-                blurRadius: _isHovered ? 12 : 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product image with NEW badge
-              Expanded(
-                flex: 3,
-                child: Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(16),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.08),
+                  blurRadius: _isHovered ? 12 : 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Product image with NEW badge
+                Expanded(
+                  flex: 3,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
                         ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
-                        ),
-                        child: Image.asset(
-                          widget.product.imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                color: Colors.grey[200],
-                                child: const Icon(
-                                  Icons.music_note,
-                                  size: 64,
-                                  color: Colors.grey,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          child: Image.network(
+                            widget.product.image,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.music_note,
+                                    size: 64,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
+                          ),
                         ),
                       ),
-                    ),
-                    if (widget.product.isNew)
-                      Positioned(
-                        top: 12,
-                        left: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            'NEW',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                      if (widget.product.isNew)
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'NEW',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              ),
-              // Product details
-              Expanded(
-                flex: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(16),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.product.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'GH ${widget.product.price.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                // Product details
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF4CAF50),
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(16),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.product.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '\$${widget.product.discountedPrice.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

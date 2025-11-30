@@ -180,40 +180,49 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(18), // Increased border radius
-          child: Image.asset(
-            category.imagePath,
-            width: 200, // Increased from 120
-            height: 160, // Increased from 80
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              width: 200,
-              height: 180,
-              color: Colors.grey[300],
-              child: const Icon(
-                Icons.broken_image,
-                size: 48, // Increased from 30
-                color: Colors.grey,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/products',
+          arguments: {'filterType': 'category', 'filterValue': category.name},
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18), // Increased border radius
+            child: Image.asset(
+              category.imagePath,
+              width: 200, // Increased from 120
+              height: 160, // Increased from 80
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 200,
+                height: 180,
+                color: Colors.grey[300],
+                child: const Icon(
+                  Icons.broken_image,
+                  size: 48, // Increased from 30
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 16), // Increased from 8
-        Text(
-          category.name,
-          style: const TextStyle(
-            color: Colors.red,
-            fontSize: 18, // Increased from 14
+          const SizedBox(height: 16), // Increased from 8
+          Text(
+            category.name,
+            style: const TextStyle(
+              color: Colors.red,
+              fontSize: 18, // Increased from 14
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
