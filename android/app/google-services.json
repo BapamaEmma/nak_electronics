@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "your-project-number",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-project-id.appspot.com"
+    "project_number": "273958353608",
+    "project_id": "naknaa-online",
+    "storage_bucket": "naknaa-online.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "your-android-app-id",
+        "mobilesdk_app_id": "1:273958353608:android:906781d0656f4ede7f83fd",
         "android_client_info": {
           "package_name": "com.example.nak_electronics"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "your-android-api-key"
+          "current_key": "AIzaSyDfbMuUmchPxMet0KgB7kARTfu1X2EUSg4"
         }
       ],
       "services": {
