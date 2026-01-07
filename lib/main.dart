@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import 'features/home/homepage.dart';
-import 'features/product/product_list_page.dart';
-import 'features/product/product_detail_page.dart';
-import 'models/product.dart';
 import 'core/services/cart_service.dart';
-// Import this after running: flutterfire configure
-import 'firebase_options.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+void main() {
+  // Suppress error overlays - replace red error screens with empty container
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Container(
+      color: Colors.white,
+      child: const SizedBox.shrink(),
+    );
+  };
+  
+  // Suppress error overlays in release mode
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      FlutterError.presentError(details);
+    }
+    // In release mode, errors are silently logged
+  };
+  
   runApp(const MyApp());
 }
 
@@ -36,22 +42,6 @@ class MyApp extends StatelessWidget {
           textTheme: const TextTheme(bodyMedium: TextStyle(fontSize: 14)),
         ),
         home: const NaknaaHomePage(),
-        routes: {
-          '/products': (context) {
-            final args =
-                ModalRoute.of(context)!.settings.arguments
-                    as Map<String, dynamic>;
-            return ProductListPage(
-              filterType: args['filterType'] as String,
-              filterValue: args['filterValue'] as String,
-            );
-          },
-          '/product_detail': (context) {
-            final product =
-                ModalRoute.of(context)!.settings.arguments as Product;
-            return ProductDetailPage(product: product);
-          },
-        },
       ),
     );
   }

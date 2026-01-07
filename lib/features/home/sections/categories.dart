@@ -181,13 +181,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/products',
-          arguments: {'filterType': 'category', 'filterValue': category.name},
-        );
-      },
+      onTap: null,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

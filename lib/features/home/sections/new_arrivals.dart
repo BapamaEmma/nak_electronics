@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nak_electronics/models/product.dart';
-import 'package:nak_electronics/features/product/product_detail_page.dart';
 
 class NewArrivalsSection extends StatefulWidget {
   const NewArrivalsSection({super.key});
@@ -253,15 +252,6 @@ class _NewArrivalsSectionState extends State<NewArrivalsSection> {
                               width: 220,
                               child: ProductCard(
                                 product: product,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProductDetailPage(product: product),
-                                    ),
-                                  );
-                                },
                               ),
                             ),
                           );
@@ -489,7 +479,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '\$${widget.product.discountedPrice.toStringAsFixed(0)}',
+                          '₵${widget.product.discountedPrice.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: Colors.red,
                             fontSize: 20,

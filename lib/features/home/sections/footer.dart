@@ -6,37 +6,46 @@ class FooterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF2C3E50),
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      color: const Color(0xFF050816),
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main footer content
+              // Top: brand + columns
           LayoutBuilder(
             builder: (context, constraints) {
-              return constraints.maxWidth > 1000
-                  ? Row(
+                  final isWide = constraints.maxWidth > 900;
+
+                  final brandColumn = Expanded(
+                    flex: 2,
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Company info
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Logo and company name
-                              Row(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Container(
-                                    width: 80,
-                                    height: 70,
+                              width: 56,
+                              height: 56,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(0),
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                                     ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(0),
+                                borderRadius: BorderRadius.circular(12),
                                       child: Image.asset(
-                                        'assets/images/logo.png', // Update path as needed
+                                  'assets/images/logo.PNG',
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -45,429 +54,261 @@ class FooterSection extends StatelessWidget {
                                   const Text(
                                     'Naknaa Electronics',
                                     style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
                                       color: Colors.white,
+                                letterSpacing: 0.2,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                               const Text(
-                                'Your trusted partner for premium musical instruments and audio equipment. We\'ve been serving musicians and audio professionals for over a decade.',
+                          'Premium instruments, sound and lighting gear for studios,\nchurches, events and creators across Ghana.',
                                 style: TextStyle(
-                                  fontSize: 16,
+                            fontSize: 13,
                                   color: Colors.white70,
                                   height: 1.5,
                                 ),
                               ),
-                              const SizedBox(height: 24),
-                              // Social media icons
-                              const Text(
-                                'Follow Us',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  _SocialIcon(Icons.facebook, () {}),
-                                  _SocialIcon(
-                                    Icons.camera_alt,
-                                    () {},
-                                  ), // Instagram
-                                  _SocialIcon(
-                                    Icons.alternate_email,
-                                    () {},
-                                  ), // Twitter
-                                  _SocialIcon(
-                                    Icons.video_library,
-                                    () {},
-                                  ), // YouTube
-                                  _SocialIcon(
-                                    Icons.business,
-                                    () {},
-                                  ), // LinkedIn
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                        // Quick links
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Quick Links',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _FooterLink('Home', () {}),
-                              _FooterLink('Categories', () {}),
-                              _FooterLink('Brands', () {}),
-                              _FooterLink('New Arrivals', () {}),
-                              _FooterLink('Special Offers', () {}),
-                              _FooterLink('About Us', () {}),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                        // Customer service
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Customer Service',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _FooterLink('Contact Us', () {}),
-                              _FooterLink('FAQ', () {}),
-                              _FooterLink('Shipping Info', () {}),
-                              _FooterLink('Returns & Exchanges', () {}),
-                              _FooterLink('Warranty', () {}),
-                              _FooterLink('Support Center', () {}),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                        // Contact info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Contact Info',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _ContactItem(
-                                Icons.location_on,
-                                'Accra, Ghana\nEast Legon, ARS Building',
-                              ),
-                              const SizedBox(height: 12),
-                              _ContactItem(
-                                Icons.phone,
-                                '+233 24 123 4567\n+233 20 987 6543',
-                              ),
-                              const SizedBox(height: 12),
-                              _ContactItem(
-                                Icons.email,
-                                'info@naknaaelectronics.com\nsupport@naknaaelectronics.com',
-                              ),
-                              const SizedBox(height: 12),
-                              _ContactItem(
-                                Icons.access_time,
-                                'Mon - Fri: 8:00 AM - 6:00 PM\nSat: 9:00 AM - 4:00 PM',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Company info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Logo and company name
-                            Row(
-                              children: [
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF8B8B),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.asset(
-                                      'assets/images/logo.png', // Update path as needed
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Naknaa Electronics',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Your trusted partner for premium musical instruments and audio equipment. We\'ve been serving musicians and audio professionals for over a decade.',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
-                                height: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Social media icons
-                            const Text(
-                              'Follow Us',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                _SocialIcon(Icons.facebook, () {}),
-                                _SocialIcon(
-                                  Icons.camera_alt,
-                                  () {},
-                                ), // Instagram
-                                _SocialIcon(
-                                  Icons.alternate_email,
-                                  () {},
-                                ), // Twitter
-                                _SocialIcon(
-                                  Icons.video_library,
-                                  () {},
-                                ), // YouTube
-                                _SocialIcon(Icons.business, () {}), // LinkedIn
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        // Quick links
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Quick Links',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _FooterLink('Home', () {}),
-                            _FooterLink('Categories', () {}),
-                            _FooterLink('Brands', () {}),
-                            _FooterLink('New Arrivals', () {}),
-                            _FooterLink('Special Offers', () {}),
-                            _FooterLink('About Us', () {}),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        // Customer service
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Customer Service',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _FooterLink('Contact Us', () {}),
-                            _FooterLink('FAQ', () {}),
-                            _FooterLink('Shipping Info', () {}),
-                            _FooterLink('Returns & Exchanges', () {}),
-                            _FooterLink('Warranty', () {}),
-                            _FooterLink('Support Center', () {}),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        // Contact info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Contact Info',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _ContactItem(
-                              Icons.location_on,
-                              'Accra, Ghana\nEast Legon, ARS Building',
-                            ),
-                            const SizedBox(height: 12),
-                            _ContactItem(
-                              Icons.phone,
-                              '+233 24 123 4567\n+233 20 987 6543',
-                            ),
-                            const SizedBox(height: 12),
-                            _ContactItem(
-                              Icons.email,
-                              'info@naknaaelectronics.com\nsupport@naknaaelectronics.com',
-                            ),
-                            const SizedBox(height: 12),
-                            _ContactItem(
-                              Icons.access_time,
-                              'Mon - Fri: 8:00 AM - 6:00 PM\nSat: 9:00 AM - 4:00 PM',
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-            },
-          ),
-          const SizedBox(height: 48),
-          // Divider
-          Container(height: 1, color: Colors.white24),
-          const SizedBox(height: 24),
-          // Bottom footer
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return constraints.maxWidth > 600
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '© 2024 Naknaa Electronics. All rights reserved.',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                        Row(
-                          children: [
-                            _FooterLink('Privacy Policy', () {}, isSmall: true),
-                            const Text(
-                              ' | ',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            _FooterLink(
-                              'Terms of Service',
-                              () {},
-                              isSmall: true,
-                            ),
-                            const Text(
-                              ' | ',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            _FooterLink('Cookie Policy', () {}, isSmall: true),
-                          ],
-                        ),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        const Text(
-                          '© 2024 Naknaa Electronics. All rights reserved.',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
-                          textAlign: TextAlign.center,
-                        ),
                         const SizedBox(height: 16),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _FooterLink('Privacy Policy', () {}, isSmall: true),
-                            const Text(
-                              ' | ',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            _FooterLink(
-                              'Terms of Service',
-                              () {},
-                              isSmall: true,
-                            ),
-                            const Text(
-                              ' | ',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            _FooterLink('Cookie Policy', () {}, isSmall: true),
+                            _SocialIcon.image('assets/images/Watup.png', () {}),
+                            _SocialIcon.image('assets/images/youtube.png', () {}),
+                            _SocialIcon.image('assets/images/TikTok.png', () {}),
                           ],
                         ),
+                            ],
+                          ),
+                  );
+
+                  final shopColumn = Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                          'Shop',
+                                style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _FooterLink('Guitars & Bass', () {}),
+                        _FooterLink('Keyboards & Pianos', () {}),
+                        _FooterLink('Drums & Percussion', () {}),
+                        _FooterLink('Studio & Recording', () {}),
+                        _FooterLink('PA & Live Sound', () {}),
+                        _FooterLink('Lighting & FX', () {}),
+                      ],
+                    ),
+                  );
+
+                  final helpColumn = Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                          'Help',
+                                style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _FooterLink('Orders & Shipping', () {}),
+                        _FooterLink('Returns & Refunds', () {}),
+                        _FooterLink('Warranty', () {}),
+                        _FooterLink('FAQs', () {}),
+                        _FooterLink('Contact support', () {}),
+                      ],
+                    ),
+                  );
+
+                  final contactColumn = Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Visit us',
+                                style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                        SizedBox(height: 12),
+                              _ContactItem(
+                          Icons.location_on_outlined,
+                                'Accra, Ghana\nEast Legon, ARS Building',
+                              ),
+                        SizedBox(height: 10),
+                              _ContactItem(
+                          Icons.phone_in_talk_outlined,
+                                '+233 24 123 4567\n+233 20 987 6543',
+                              ),
+                        SizedBox(height: 10),
+                              _ContactItem(
+                          Icons.email_outlined,
+                          'info@naknaaelectronics.com',
+                              ),
+                        SizedBox(height: 10),
+                              _ContactItem(
+                          Icons.schedule_outlined,
+                          'Mon – Sat: 7:00 am – 5:00 pm',
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (isWide) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        brandColumn,
+                        const SizedBox(width: 40),
+                        shopColumn,
+                        const SizedBox(width: 24),
+                        helpColumn,
+                        const SizedBox(width: 24),
+                        contactColumn,
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      brandColumn,
+                      const SizedBox(height: 32),
+                      shopColumn,
+                      const SizedBox(height: 24),
+                      helpColumn,
+                      const SizedBox(height: 24),
+                      contactColumn,
                       ],
                     );
             },
           ),
-          const SizedBox(height: 24),
-          // Payment methods
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
+              const SizedBox(height: 28),
+              // Thin divider
+              Container(
+                height: 1,
+                color: Colors.white24,
+              ),
+              const SizedBox(height: 18),
+              // Bottom bar: copyright + policies + payments
+          LayoutBuilder(
+            builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 800;
+
+                  final copyrightText =
+                      const Text('© 2024 Naknaa Electronics. All rights reserved.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ));
+
+                  final policyRow = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _FooterLink('Privacy', () {}, isSmall: true),
+                      const SizedBox(width: 8),
+                      _FooterLink('Terms', () {}, isSmall: true),
+                      const SizedBox(width: 8),
+                      _FooterLink('Cookies', () {}, isSmall: true),
+                    ],
+                  );
+
+                  final paymentsRow = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      _PaymentImageIcon('assets/images/momo.png'),
+                      _PaymentImageIcon('assets/images/telcel.png'),
+                    ],
+                  );
+
+                  if (isWide) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            copyrightText,
+                            const SizedBox(width: 16),
+                            policyRow,
+                          ],
+                        ),
+                        paymentsRow,
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'We Accept',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                      copyrightText,
+                      const SizedBox(height: 8),
+                      policyRow,
                 const SizedBox(height: 12),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _PaymentIcon('Visa'),
-                    _PaymentIcon('Mastercard'),
-                    _PaymentIcon('MTN Mobile Money'),
-                    _PaymentIcon('Vodafone Cash'),
-                    _PaymentIcon('AirtelTigo Money'),
-                  ],
+                      paymentsRow,
+                    ],
+                  );
+                },
                 ),
               ],
             ),
           ),
-        ],
       ),
     );
   }
 }
 
-class _SocialIcon extends StatelessWidget {
-  final IconData icon;
+class _SocialIcon extends StatefulWidget {
+  final String imagePath;
   final VoidCallback onTap;
 
-  const _SocialIcon(this.icon, this.onTap);
+  const _SocialIcon.image(this.imagePath, this.onTap);
 
+  @override
+  State<_SocialIcon> createState() => _SocialIconState();
+}
+
+class _SocialIconState extends State<_SocialIcon> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.white.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: Colors.white24,
+            ),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: Center(
+              child: Image.asset(
+                widget.imagePath,
+                width: 26,
+                height: 26,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox(width: 26, height: 26);
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -492,8 +333,7 @@ class _FooterLink extends StatelessWidget {
           style: TextStyle(
             fontSize: isSmall ? 14 : 16,
             color: Colors.white70,
-            decoration: TextDecoration.underline,
-            decorationColor: Colors.transparent,
+            decoration: TextDecoration.none,
           ),
         ),
       ),
@@ -529,27 +369,24 @@ class _ContactItem extends StatelessWidget {
   }
 }
 
-class _PaymentIcon extends StatelessWidget {
-  final String name;
+class _PaymentImageIcon extends StatelessWidget {
+  final String assetPath;
 
-  const _PaymentIcon(this.name);
+  const _PaymentImageIcon(this.assetPath);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Text(
-        name,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
+      child: Image.asset(
+        assetPath,
+        height: 24,
+        fit: BoxFit.contain,
       ),
     );
   }

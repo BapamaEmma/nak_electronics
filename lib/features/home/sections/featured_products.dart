@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:nak_electronics/core/services/cart_service.dart';
+import 'package:nak_electronics/models/product.dart';
 
 class FeaturedProductsSection extends StatefulWidget {
   const FeaturedProductsSection({super.key});
@@ -117,7 +120,7 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
           ),
           const SizedBox(height: 32),
           Container(
-            height: 420,
+            height: 480,
             margin: const EdgeInsets.symmetric(horizontal: 24),
             child: Stack(
               children: [
@@ -221,6 +224,23 @@ class FeaturedProduct {
     required this.reviewCount,
     required this.isBestSeller,
   });
+
+  /// Converts FeaturedProduct to Product for cart functionality
+  Product toProduct() {
+    final discount = (originalPrice - price) / originalPrice;
+    return Product(
+      id: id,
+      name: name,
+      price: originalPrice,
+      image: imagePath,
+      category: 'Featured',
+      brand: 'Premium',
+      description: 'Featured product with $rating star rating',
+      isNew: isBestSeller,
+      discount: discount > 0 ? discount : null,
+      type: 'Instrument',
+    );
+  }
 }
 
 class FeaturedProductCard extends StatefulWidget {
@@ -352,48 +372,60 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
-                      Text(
-                        widget.product.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                      // Fixed height for product name (2 lines max)
+                      SizedBox(
+                        height: 48,
+                        child: Text(
+                          widget.product.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
-                      // Rating
-                      Row(
-                        children: [
-                          Row(
-                            children: List.generate(5, (index) {
-                              return Icon(
-                                index < widget.product.rating.floor()
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: Colors.amber,
-                                size: 16,
-                              );
-                            }),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${widget.product.rating} (${widget.product.reviewCount})',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                      // Fixed height for rating
+                      SizedBox(
+                        height: 20,
+                        child: Row(
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(5, (index) {
+                                return Icon(
+                                  index < widget.product.rating.floor()
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 16,
+                                );
+                              }),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                '${widget.product.rating} (${widget.product.reviewCount})',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const Spacer(),
-                      // Price
+                      // Price section - fixed at bottom
                       Row(
                         children: [
                           Text(
-                            'GH ${widget.product.price.toStringAsFixed(0)}',
+                            '₵${widget.product.price.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -401,15 +433,55 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            'GH ${widget.product.originalPrice.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                              decoration: TextDecoration.lineThrough,
+                          Flexible(
+                            child: Text(
+                              '₵${widget.product.originalPrice.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Add to Cart button - always at bottom
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            final cart = Provider.of<CartService>(context, listen: false);
+                            final product = widget.product.toProduct();
+                            cart.addToCart(product);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${widget.product.name} added to cart'),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 2,
+                          ),
+                          icon: const Icon(Icons.shopping_cart, size: 16),
+                          label: const Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),

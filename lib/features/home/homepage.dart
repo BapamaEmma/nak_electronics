@@ -8,6 +8,8 @@ import 'package:nak_electronics/features/home/sections/brands.dart';
 import 'package:nak_electronics/features/home/sections/new_arrivals.dart';
 import 'package:nak_electronics/features/home/sections/featured_products.dart';
 import 'package:nak_electronics/features/home/sections/special_deals.dart';
+import 'package:nak_electronics/features/home/sections/explore_products.dart';
+import 'package:nak_electronics/features/home/sections/cart_drawer.dart';
 import 'package:nak_electronics/features/home/sections/testimonials.dart';
 import 'package:nak_electronics/features/home/sections/newsletter.dart';
 import 'package:nak_electronics/features/home/sections/footer.dart';
@@ -29,6 +31,7 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
 
   // Added: scroll controller + keys for sections
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _exploreKey = GlobalKey();
   final GlobalKey _categoriesKey = GlobalKey();
   final GlobalKey _newArrivalsKey = GlobalKey();
   final GlobalKey _featuredKey = GlobalKey();
@@ -137,6 +140,8 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
     final double heroHeight = MediaQuery.of(context).size.height * 0.80;
 
     return Scaffold(
+      drawer: const _MainSideMenu(),
+      endDrawer: const CartDrawer(),
       body: Column(
         children: [
           // Pass a callback to the appbar so nav menu items can request scrolling
@@ -169,6 +174,7 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
                     break;
                 }
               },
+              onSearchTap: () => _scrollToKey(_exploreKey),
             ),
           ),
           const SizedBox(height: 15),
@@ -362,6 +368,11 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
                       ),
                     ),
                   ),
+              // SHEIN-style explore / catalog section
+              Container(
+                key: _exploreKey,
+                child: const ExploreProductsSection(),
+                  ),
                   // Categories section (keyed)
                   Container(
                     key: _categoriesKey,
@@ -370,7 +381,7 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
                   // New Arrivals section
                   Container(
                     key: _newArrivalsKey,
-                    child: const NewArrivalsSection(),
+                    // child: const NewArrivalsSection(), // Uncomment when ready to use
                   ),
                   // Featured Products section
                   Container(
@@ -405,7 +416,11 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
 
 class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final void Function(String) onItemSelected;
-  const _CustomAppBar({required this.onItemSelected});
+  final VoidCallback onSearchTap;
+  const _CustomAppBar({
+    required this.onItemSelected,
+    required this.onSearchTap,
+  });
   @override
   Size get preferredSize => const Size.fromHeight(20);
 
@@ -416,7 +431,7 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       height: 70,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 175, 106, 106).withOpacity(0.95),
+        color: Colors.white70,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -426,15 +441,15 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
-            icon: const Icon(size: 30, Icons.menu, color: Colors.black87),
-            onPressed: () {},
-          ),
-          // LOGO (replace error text with your actual logo)
+          // Left: modern hamburger + logo
+          Row(
+            children: [
+              const _ModernHamburgerButton(),
+              const SizedBox(width: 24),
           Padding(
             padding: const EdgeInsets.only(left: 4, right: 8),
             child: SizedBox(
@@ -444,88 +459,75 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Image.asset(
                   'assets/images/logo.PNG',
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Text(
-                    'Unable to load asset: "assets/images/logo.png".\nThe asset does not exist or has empty data.',
-                    style: TextStyle(fontSize: 8, color: Colors.red[900]),
-                    textAlign: TextAlign.center,
-                  ),
+                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
                 ),
               ),
             ),
           ),
-          // Search Bar
+            ],
+          ),
+          // Center: navigation menu
           Expanded(
-            child: Container(
-              height: 40,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search Product',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[600],
+            child: Center(
+              child: _NavMenu(onItemSelected: onItemSelected),
+            ),
+          ),
+          // Right: search, wishlist, cart + auth buttons
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Search pill (scrolls to explore section)
+              TextButton.icon(
+                onPressed: onSearchTap,
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.grey[800],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                icon: const Icon(Icons.search, size: 18),
+                label: const Text(
+                  'Search products',
+                  style: TextStyle(
+                    fontSize: 12,
                     fontFamily: 'Poppins',
                   ),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
                 ),
               ),
-            ),
-          ),
-          _NavMenu(onItemSelected: onItemSelected),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavMenu extends StatelessWidget {
-  final void Function(String) onItemSelected;
-  const _NavMenu({required this.onItemSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    // List of menu items
-    final navItems = [
-      _NavMenuItem('Home', isActive: true, onTap: () => onItemSelected('Home')),
-      _NavMenuItem('Categories', onTap: () => onItemSelected('Categories')),
-      _NavMenuItem(
-        'Deals & Offers',
-        onTap: () => onItemSelected('Deals & Offers'),
-      ),
-      _NavMenuItem('Brands', onTap: () => onItemSelected('Brands')),
-      _NavMenuItem('About Us', onTap: () => onItemSelected('About Us')),
-    ];
-
-    return Row(
-      children: [
-        ...navItems,
-        // Cart icon
-        Consumer<CartService>(
-          builder: (context, cart, child) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 30,
-                    color: Colors.black87,
-                  ),
-                  onPressed: () {
-                    // TODO: Navigate to cart page
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Cart: ${cart.totalQuantity} items'),
-                      ),
-                    );
-                  },
+              const SizedBox(width: 8),
+              // Wishlist icon (placeholder)
+              IconButton(
+                icon: const Icon(
+                  Icons.favorite_border,
+                  color: Colors.black87,
                 ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Wishlist coming soon'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                },
+              ),
+              Consumer<CartService>(
+                builder: (context, cart, child) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 30,
+                          color: Colors.black87,
+                        ),
+                        onPressed: () {
+                          Scaffold.of(context).openEndDrawer();
+                        },
+                      ),
                 if (cart.totalQuantity > 0)
                   Positioned(
                     right: 0,
@@ -553,7 +555,6 @@ class _NavMenu extends StatelessWidget {
             ),
           ),
         ),
-        // SignUp button
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6),
           child: ElevatedButton(
@@ -563,7 +564,8 @@ class _NavMenu extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               elevation: 0,
             ),
             onPressed: () {},
@@ -573,24 +575,464 @@ class _NavMenu extends StatelessWidget {
             ),
           ),
         ),
-        // Login button
         Padding(
           padding: const EdgeInsets.only(right: 16, left: 6),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFFF8B8B),
+                    backgroundColor: const Color(0xFFFF8B8B),
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               elevation: 0,
             ),
             onPressed: () {},
-            child: const Text('Login', style: TextStyle(fontFamily: 'Poppins')),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
           ),
         ),
       ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Modern hamburger button with hover/press effects.
+class _ModernHamburgerButton extends StatefulWidget {
+  const _ModernHamburgerButton();
+
+  @override
+  State<_ModernHamburgerButton> createState() => _ModernHamburgerButtonState();
+}
+
+class _ModernHamburgerButtonState extends State<_ModernHamburgerButton> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = _isPressed
+        ? Colors.black.withOpacity(0.20)
+        : _isHovered
+            ? Colors.black.withOpacity(0.12)
+            : Colors.black.withOpacity(0.06);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _isPressed = false;
+      }),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTap: () {
+          final scaffoldState = Scaffold.maybeOf(context);
+          if (scaffoldState != null) {
+            scaffoldState.openDrawer();
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.4),
+              width: 0.7,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 3-line hamburger icon
+              SizedBox(
+                width: 18,
+                height: 14,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildLine(),
+                    _buildLine(widthFactor: 0.8),
+                    _buildLine(widthFactor: 0.6),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Menu',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLine({double widthFactor = 1}) {
+    return FractionallySizedBox(
+      widthFactor: widthFactor,
+      alignment: Alignment.centerLeft,
+      child: Container(
+        height: 2,
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(999),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavMenu extends StatelessWidget {
+  final void Function(String) onItemSelected;
+  const _NavMenu({required this.onItemSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    // List of menu items
+    final List<Widget> navItems = [
+      _NavMenuItem('Home', isActive: true, onTap: () => onItemSelected('Home')),
+      const SizedBox(width: 8),
+      const _CategoriesMegaMenu(),
+      const SizedBox(width: 8),
+      _NavMenuItem(
+        'Deals & Offers',
+        onTap: () => onItemSelected('Deals & Offers'),
+      ),
+      const SizedBox(width: 8),
+      _NavMenuItem('Brands', onTap: () => onItemSelected('Brands')),
+      const SizedBox(width: 8),
+      _NavMenuItem('About Us', onTap: () => onItemSelected('About Us')),
+    ];
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: navItems,
+    );
+  }
+}
+
+/// Left side main menu drawer for the hamburger button.
+class _MainSideMenu extends StatelessWidget {
+  const _MainSideMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DrawerHeader(
+              margin: EdgeInsets.zero,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFFFF8B8B),
+                    Color(0xFFB83B3B),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 64,
+                        height: 64,
+                        child: Image.asset(
+                          'assets/images/logo.PNG',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.music_note, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Naknaa Electronics',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Shop premium instruments, sound, lighting\nand studio gear in one place.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  const _DrawerSectionHeader('Shop by category'),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/guitar copy.png',
+                    label: 'Guitars & Bass',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/keyboard copy.png',
+                    label: 'Keyboards & Pianos',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/drum.png',
+                    label: 'Drums & Percussion',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/headset.png',
+                    label: 'Headphones & Monitors',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/microphone copy.png',
+                    label: 'Microphones & Recording',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/speaker.png',
+                    label: 'PA & Live Sound',
+                  ),
+                  const _DrawerItem(
+                    imagePath: 'assets/images/light copy.png',
+                    label: 'Lighting & Effects',
+                  ),
+                  const Divider(),
+                  const _DrawerSectionHeader('Account & orders'),
+                  const _DrawerItem(
+                    icon: Icons.person_outline,
+                    label: 'Sign in / Create account',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.shopping_bag_outlined,
+                    label: 'My orders',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.favorite_border,
+                    label: 'Wishlist',
+                  ),
+                  const Divider(),
+                  const _DrawerSectionHeader('Contact & hours'),
+                  const _DrawerItem(
+                    icon: Icons.phone_in_talk,
+                    label: 'Call: +233 24 000 0000',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.email_outlined,
+                    label: 'Email: info@naknaa-music.com',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.location_on_outlined,
+                    label: 'Location: Accra, Ghana',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.schedule,
+                    label: 'Mon–Sat: 7:00am – 5:00pm',
+                  ),
+                  const Divider(),
+                  const _DrawerSectionHeader('Support'),
+                  const _DrawerItem(
+                    icon: Icons.help_outline,
+                    label: 'Help & FAQs',
+                  ),
+                  const _DrawerItem(
+                    icon: Icons.chat_bubble_outline,
+                    label: 'Contact Naknaa',
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerSectionHeader extends StatelessWidget {
+  final String title;
+  const _DrawerSectionHeader(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData? icon;
+  final String? imagePath;
+  final String label;
+  const _DrawerItem({
+    this.icon,
+    this.imagePath,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      leading: imagePath != null
+          ? SizedBox(
+              width: 26,
+              height: 26,
+              child: Image.asset(
+                imagePath!,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+              ),
+            )
+          : ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [
+                  Color(0xFFFF4B5C),
+                  Color(0xFFFF6B8B),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: Icon(icon ?? Icons.error_outline, size: 26, color: Colors.white),
+            ),
+      title: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontFamily: 'Poppins',
+        ),
+      ),
+      onTap: () {
+        Navigator.of(context).maybePop();
+      },
+    );
+  }
+}
+
+/// SHEIN-style "Categories" mega menu in the app bar.
+class _CategoriesMegaMenu extends StatelessWidget {
+  const _CategoriesMegaMenu();
+
+  static const _categories = <String>[
+    'Guitars & Bass',
+    'Keyboard',
+    'Drums & Percussion',
+    'Headphones',
+    'Microphones',
+    'Amplifiers',
+    'Mixers',
+    'PA System & Live Sound',
+    'Lighting & Effect',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: PopupMenuButton<String>(
+        tooltip: 'Browse categories',
+        position: PopupMenuPosition.under,
+        offset: const Offset(0, 6),
+        itemBuilder: (context) {
+          return [
+            const PopupMenuItem<String>(
+              enabled: false,
+              child: Text(
+                'Shop by Category',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ),
+            const PopupMenuDivider(),
+            ..._categories.map(
+              (c) => PopupMenuItem<String>(
+                value: c,
+                child: Text(
+                  c,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ),
+            ),
+          ];
+        },
+        onSelected: (_) {
+          // For now, just scroll to the Categories section via callback.
+          // The actual callback is wired through _NavMenuItem('Categories')
+          // which still uses onItemSelected('Categories').
+          final state = context.findAncestorStateOfType<_NaknaaHomePageState>();
+          if (state != null) {
+            state._scrollToKey(state._categoriesKey);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Text(
+              'Categories',
+              style: TextStyle(
+                color: Colors.black87,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.normal,
+                fontSize: 18,
+              ),
+            ),
+            SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: Colors.white,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -607,109 +1049,86 @@ class _NavMenuItem extends StatefulWidget {
 
 class _NavMenuItemState extends State<_NavMenuItem>
     with SingleTickerProviderStateMixin {
-  bool _pressed = false;
   bool _hovered = false;
-
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnim;
-  late Animation<double> _scaleAnim;
+  late AnimationController _controller;
+  late Animation<double> _widthAnimation;
+  final GlobalKey _textKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 250),
     );
-    _fadeAnim = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
+    _widthAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
     );
-    _scaleAnim = Tween<double>(begin: 1.0, end: 1.08).animate(_fadeAnim);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _controller.dispose();
     super.dispose();
-  }
-
-  void _onHoverDown(TapDownDetails details) {
-    setState(() {
-      _pressed = true;
-      _animationController.forward();
-    });
-  }
-
-  void _onHoverUp(TapUpDetails details) {
-    setState(() {
-      _pressed = false;
-      _animationController.reverse();
-    });
-  }
-
-  void _onTapCancel() {
-    setState(() {
-      _pressed = false;
-      _animationController.reverse();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isActive = widget.isActive;
-    final bool showHighlight = _hovered || _pressed || isActive;
-    final Color highlightColor = const Color.fromARGB(
-      255,
-      212,
-      111,
-      111,
-    ); // Light red
-
     return MouseRegion(
       onEnter: (_) {
         setState(() {
           _hovered = true;
-          _animationController.forward();
         });
+        _controller.forward();
       },
       onExit: (_) {
         setState(() {
           _hovered = false;
-          _animationController.reverse();
         });
+        _controller.reverse();
       },
       child: GestureDetector(
-        onTapDown: _onHoverDown,
-        onTapUp: _onHoverUp,
-        onTapCancel: _onTapCancel,
         onTap: widget.onTap,
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) => Transform.scale(
-            scale: _scaleAnim.value,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: showHighlight
-                    ? highlightColor.withOpacity(_fadeAnim.value)
-                    : const Color.fromARGB(0, 215, 112, 112),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Text(
+                widget.title,
+                key: _textKey,
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black87,
                   fontWeight: FontWeight.normal,
+                  fontFamily: 'Poppins',
                 ),
-                child: Text(widget.title),
               ),
-            ),
+              Positioned(
+                left: 0,
+                bottom: -2,
+                child: AnimatedBuilder(
+                  animation: _widthAnimation,
+                  builder: (context, child) {
+                    final renderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
+                    final textWidth = renderBox?.size.width ?? 0;
+                    return Container(
+                      height: 1.5,
+                      width: textWidth * _widthAnimation.value,
+                      decoration: BoxDecoration(
+                        color: _hovered ? Colors.black87 : Colors.transparent,
+                        borderRadius: BorderRadius.circular(0.75),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),

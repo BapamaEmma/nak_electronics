@@ -42,16 +42,7 @@ class BrandsSection extends StatelessWidget {
             crossAxisSpacing: 12,
             children: _brandLogos.map((brand) {
               return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/products',
-                    arguments: {
-                      'filterType': 'brand',
-                      'filterValue': brand['name'],
-                    },
-                  );
-                },
+                onTap: null,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

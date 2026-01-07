@@ -52,8 +52,8 @@ class _NewsletterSectionState extends State<NewsletterSection> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color.fromARGB(255, 19, 13, 10),
-            Color.fromARGB(255, 218, 216, 214),
+            Color(0xFFFF4B5C),
+            Color(0xFFFF6B8B),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -67,9 +67,73 @@ class _NewsletterSectionState extends State<NewsletterSection> {
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return constraints.maxWidth > 800
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Transparent oval accents on top of the gradient container
+          Positioned(
+            top: -20,
+            left: -10,
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.22),
+                  width: 1.4,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            right: 80,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.14),
+                  width: 1.1,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -30,
+            right: -20,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.16),
+                  width: 1.2,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            left: 140,
+            child: Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.10),
+                  width: 0.9,
+                ),
+              ),
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return constraints.maxWidth > 800
               ? Row(
                   children: [
                     // Left side - Content
@@ -399,7 +463,9 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                     ),
                   ],
                 );
-        },
+            },
+          ),
+        ],
       ),
     );
   }
