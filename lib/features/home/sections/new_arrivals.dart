@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nak_electronics/models/product.dart';
+import 'package:nak_electronics/core/utils/image_widget.dart';
 
 class NewArrivalsSection extends StatefulWidget {
   const NewArrivalsSection({super.key});
@@ -411,18 +412,11 @@ class _ProductCardState extends State<ProductCard> {
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(16),
                           ),
-                          child: Image.network(
-                            widget.product.image,
+                          child: ProductImage(
+                            imagePath: widget.product.image,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(
-                                    Icons.music_note,
-                                    size: 64,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
                         ),
                       ),

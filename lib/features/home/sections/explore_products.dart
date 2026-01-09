@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nak_electronics/core/services/product_service.dart';
 import 'package:nak_electronics/models/product.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nak_electronics/features/product/product_detail_page.dart';
+import 'package:nak_electronics/core/utils/image_widget.dart';
 
 /// SHEIN-style explore section: search, filters, and a responsive product grid.
 class ExploreProductsSection extends StatefulWidget {
@@ -14,17 +16,44 @@ class ExploreProductsSection extends StatefulWidget {
 }
 
 class _ExploreProductsSectionState extends State<ExploreProductsSection> {
-  late List<Product> _allProducts;
+  List<Product> _allProducts = [];
   String _searchQuery = '';
   String _selectedCategory = 'All';
   String _selectedSort = 'Popular';
   int _itemsToShow = 12; // Initial number of products to display
   static const int _itemsPerPage = 12; // Products to load per "Load More" click
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _allProducts = ProductService.getAllProducts();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final products = await ProductService.getAllProducts();
+      print('ExploreProducts: Loaded ${products.length} products');
+      for (var product in products) {
+        print('ExploreProducts: Product: ${product.name}, Image: ${product.image}');
+      }
+      setState(() {
+        _allProducts = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('ExploreProducts: Error loading products: $e');
+      setState(() {
+        _errorMessage = 'Failed to load products. Please try again.';
+        _isLoading = false;
+      });
+    }
   }
 
   List<String> get _categories {
@@ -113,7 +142,38 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
               children: [
                 _buildFiltersRow(),
                 const SizedBox(height: 24),
-                if (allFilteredProducts.isEmpty)
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 80),
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text(
+                          'Loading products...',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Column(
+                      children: [
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadProducts,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (allFilteredProducts.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 40),
                     child: Text(
@@ -385,6 +445,13 @@ class _ProductGridCardState extends State<_ProductGridCard> {
   Widget build(BuildContext context) {
     final product = widget.product;
     final cart = Provider.of<CartService>(context, listen: false);
+    
+    // Debug: Print product image info
+    if (kDebugMode) {
+      print('_ProductGridCard: Building card for ${product.name}');
+      print('_ProductGridCard: Image path: ${product.image}');
+      print('_ProductGridCard: Image is empty: ${product.image.isEmpty}');
+    }
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -410,22 +477,17 @@ class _ProductGridCardState extends State<_ProductGridCard> {
             Expanded(
               flex: 3,
               child: Stack(
+                fit: StackFit.expand,
                 children: [
                   ClipRRect(
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: Image.asset(
-                      product.image,
+                    child: SizedBox(
                       width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[200],
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.music_note,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
+                      height: double.infinity,
+                      child: ProductImage(
+                        imagePath: product.image,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -472,6 +534,43 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
+                        ),
+                      ),
+                    ),
+                  // Stock status badge
+                  if (product.availability != null)
+                    Positioned(
+                      bottom: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: product.inStock 
+                              ? Colors.green.withOpacity(0.9)
+                              : Colors.red.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              product.inStock ? Icons.check_circle : Icons.cancel,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              product.stockStatus,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

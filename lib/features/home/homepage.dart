@@ -13,6 +13,7 @@ import 'package:nak_electronics/features/home/sections/cart_drawer.dart';
 import 'package:nak_electronics/features/home/sections/testimonials.dart';
 import 'package:nak_electronics/features/home/sections/newsletter.dart';
 import 'package:nak_electronics/features/home/sections/footer.dart';
+import 'package:nak_electronics/features/category/category_products_page.dart';
 
 class NaknaaHomePage extends StatefulWidget {
   const NaknaaHomePage({super.key});
@@ -802,33 +803,40 @@ class _MainSideMenu extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   const _DrawerSectionHeader('Shop by category'),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/guitar copy.png',
                     label: 'Guitars & Bass',
+                    categoryName: 'Guitars & Bass',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/keyboard copy.png',
                     label: 'Keyboards & Pianos',
+                    categoryName: 'Keyboard',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/drum.png',
                     label: 'Drums & Percussion',
+                    categoryName: 'Drums & Percussion',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/headset.png',
                     label: 'Headphones & Monitors',
+                    categoryName: 'Headphones',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/microphone copy.png',
                     label: 'Microphones & Recording',
+                    categoryName: 'Microphones',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/speaker.png',
                     label: 'PA & Live Sound',
+                    categoryName: 'PA System & Live Sound',
                   ),
-                  const _DrawerItem(
+                  _DrawerItem(
                     imagePath: 'assets/images/light copy.png',
                     label: 'Lighting & Effects',
+                    categoryName: 'Lighting & Effect',
                   ),
                   const Divider(),
                   const _DrawerSectionHeader('Account & orders'),
@@ -908,10 +916,12 @@ class _DrawerItem extends StatelessWidget {
   final IconData? icon;
   final String? imagePath;
   final String label;
+  final String? categoryName;
   const _DrawerItem({
     this.icon,
     this.imagePath,
     required this.label,
+    this.categoryName,
   });
 
   @override
@@ -948,6 +958,16 @@ class _DrawerItem extends StatelessWidget {
       ),
       onTap: () {
         Navigator.of(context).maybePop();
+        if (categoryName != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CategoryProductsPage(
+                categoryName: categoryName!,
+              ),
+            ),
+          );
+        }
       },
     );
   }
@@ -1003,14 +1023,16 @@ class _CategoriesMegaMenu extends StatelessWidget {
             ),
           ];
         },
-        onSelected: (_) {
-          // For now, just scroll to the Categories section via callback.
-          // The actual callback is wired through _NavMenuItem('Categories')
-          // which still uses onItemSelected('Categories').
-          final state = context.findAncestorStateOfType<_NaknaaHomePageState>();
-          if (state != null) {
-            state._scrollToKey(state._categoriesKey);
-          }
+        onSelected: (category) {
+          // Navigate to category products page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CategoryProductsPage(
+                categoryName: category,
+              ),
+            ),
+          );
         },
         child: Row(
           mainAxisSize: MainAxisSize.min,

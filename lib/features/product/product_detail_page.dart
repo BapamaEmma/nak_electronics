@@ -4,18 +4,47 @@ import 'package:nak_electronics/models/product.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/core/services/product_service.dart';
 import 'package:nak_electronics/features/home/sections/cart_drawer.dart';
+import 'package:nak_electronics/core/utils/image_widget.dart';
 
 /// SHEIN-style product details page.
 ///
-/// Usage (local data):
+/// Usage:
 ///   ProductDetailPage(product: product);
-///
-/// Usage (Firestore when you re-enable Firebase):
-///   ProductDetailPage.fromId(productId: '123', preferFirestore: true);
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends StatefulWidget {
   final Product product;
 
   const ProductDetailPage({super.key, required this.product});
+
+  @override
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  List<Product> _relatedProducts = [];
+  bool _isLoadingRelated = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRelatedProducts();
+  }
+
+  Future<void> _loadRelatedProducts() async {
+    try {
+      final products = await ProductService.getProductsByCategory(widget.product.category);
+      setState(() {
+        _relatedProducts = products
+            .where((p) => p.id != widget.product.id)
+            .take(6)
+            .toList();
+        _isLoadingRelated = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingRelated = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +52,7 @@ class ProductDetailPage extends StatelessWidget {
       backgroundColor: Colors.white,
       endDrawer: const CartDrawer(),
       body: SafeArea(
-        child: _buildResolvedBody(context, product),
+        child: _buildResolvedBody(context, widget.product),
       ),
     );
   }
@@ -31,11 +60,6 @@ class ProductDetailPage extends StatelessWidget {
   /// Builds the full detail view given a resolved product.
   Widget _buildResolvedBody(BuildContext context, Product resolved,
       {String? error}) {
-    // For related products, use local data for now (can be enhanced later)
-    final related = ProductService.getProductsByCategory(resolved.category)
-        .where((p) => p.id != resolved.id)
-        .take(6)
-        .toList();
 
     return Column(
       children: [
@@ -59,8 +83,13 @@ class ProductDetailPage extends StatelessWidget {
                 children: [
                   _buildMainContent(context, resolved),
                   const SizedBox(height: 32),
-                  if (related.isNotEmpty)
-                    _RelatedProductsRow(products: related),
+                  if (_isLoadingRelated)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: CircularProgressIndicator(),
+                    )
+                  else if (_relatedProducts.isNotEmpty)
+                    _RelatedProductsRow(products: _relatedProducts),
                 ],
               ),
             ),
@@ -132,83 +161,71 @@ class ProductDetailPage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left: image gallery
+        // Product image on the left
         Expanded(
           flex: 3,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: AspectRatio(
-                  aspectRatio: 4 / 3,
-              child: Image.asset(
-                product.image,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.music_note,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: ProductImage(
+                      imagePath: product.image,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  if (product.isNew)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+              // Stock status badge on image
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: product.inStock 
+                        ? Colors.green.withOpacity(0.9)
+                        : Colors.red.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        product.inStock ? Icons.check_circle : Icons.cancel,
+                        size: 14,
+                        color: Colors.white,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Text(
-                        'NEW',
-                        style: TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  if (product.discount != null) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        '-${(product.discount! * 100).round()}%',
+                      const SizedBox(width: 4),
+                      Text(
+                        product.stockStatus,
                         style: const TextStyle(
-                          color: Colors.white,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ],
-                ],
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(width: 40),
-        // Right: details + actions
+        // Product details on the right
         Expanded(
-          flex: 4,
+          flex: 2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -220,8 +237,8 @@ class ProductDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-            Text(
-              product.name,
+              Text(
+                product.name,
                 style: theme.textTheme.headlineSmall!.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -229,25 +246,107 @@ class ProductDetailPage extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-            Text(
-              '₵${product.discountedPrice.toStringAsFixed(2)}',
+                  Text(
+                    '₵${product.discountedPrice.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 26,
-                fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                       color: Colors.redAccent,
-              ),
-            ),
+                    ),
+                  ),
                   if (product.discount != null) ...[
                     const SizedBox(width: 8),
-              Text(
-                '₵${product.price.toStringAsFixed(2)}',
-                style: const TextStyle(
+                    Text(
+                      '₵${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
                         fontSize: 16,
-                  color: Colors.grey,
-                  decoration: TextDecoration.lineThrough,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
                       ),
                     ),
                   ],
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Item Number
+              if (product.itemNumber != null) ...[
+                Row(
+                  children: [
+                    const Text(
+                      'Item #: ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      product.itemNumber!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+              // Availability/Stock Status
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: product.inStock 
+                          ? Colors.green.withOpacity(0.1)
+                          : Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: product.inStock ? Colors.green : Colors.red,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          product.inStock ? Icons.check_circle : Icons.cancel,
+                          size: 16,
+                          color: product.inStock ? Colors.green : Colors.red,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          product.stockStatus,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: product.inStock ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (product.colours != null && product.colours!.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        product.colours!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -273,7 +372,7 @@ class ProductDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-            Text(
+              Text(
                 product.description,
                 style: const TextStyle(fontSize: 14, height: 1.5),
               ),
@@ -373,19 +472,13 @@ class _RelatedProductsRow extends StatelessWidget {
                           Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          p.image,
+                        child: ProductImage(
+                          imagePath: p.image,
                           width: double.infinity,
-                                  fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            color: Colors.grey[200],
-                            alignment: Alignment.center,
-                            child: const Icon(Icons.music_note),
-                                ),
-                              ),
-                            ),
-                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                           const SizedBox(height: 8),
                           Text(
                       p.name,

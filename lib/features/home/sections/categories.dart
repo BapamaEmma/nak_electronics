@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, unused_element
 
 import 'package:flutter/material.dart';
+import 'package:nak_electronics/features/category/category_products_page.dart';
 
 class PopularCategoriesSection extends StatefulWidget {
   const PopularCategoriesSection({super.key});
@@ -181,7 +182,16 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: null,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryProductsPage(
+              categoryName: category.name,
+            ),
+          ),
+        );
+      },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

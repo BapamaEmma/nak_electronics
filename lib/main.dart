@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => CartService())],
       child: MaterialApp(
-        title: 'Naknaa Music Store',
+        title: 'Naknaa-Oline',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.red,
