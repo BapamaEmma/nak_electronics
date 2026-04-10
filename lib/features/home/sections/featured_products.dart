@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/models/product.dart';
+import 'package:nak_electronics/features/product/product_detail_page.dart';
 
 class FeaturedProductsSection extends StatefulWidget {
   const FeaturedProductsSection({super.key});
@@ -18,20 +20,30 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
   List<FeaturedProduct> _featuredProducts = [];
   bool _isLoading = true;
   StreamSubscription? _subscription;
+  DateTime? _loadingStart;
 
   @override
   void initState() {
     super.initState();
+    _loadingStart = DateTime.now();
     _subscription = FirebaseFirestore.instance
         .collection('featured_products')
         .orderBy('order')
         .snapshots()
         .listen((snap) {
-      setState(() {
-        _featuredProducts =
-            snap.docs.map(FeaturedProduct.fromFirestore).toList();
-        _isLoading = false;
-      });
+      final elapsed = DateTime.now().difference(_loadingStart!).inMilliseconds;
+      final remaining = 1500 - elapsed;
+      void applyData() {
+        if (mounted) setState(() {
+          _featuredProducts = snap.docs.map(FeaturedProduct.fromFirestore).toList();
+          _isLoading = false;
+        });
+      }
+      if (remaining > 0) {
+        Future.delayed(Duration(milliseconds: remaining), applyData);
+      } else {
+        applyData();
+      }
     }, onError: (_) => setState(() => _isLoading = false));
   }
 
@@ -79,9 +91,20 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
           ),
           const SizedBox(height: 32),
           if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
-              child: CircularProgressIndicator(),
+            SizedBox(
+              height: 420,
+              child: Shimmer.fromColors(
+                baseColor: const Color(0xFFE0E0E0),
+                highlightColor: Colors.white,
+                period: const Duration(milliseconds: 2500),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemCount: 5,
+                  separatorBuilder: (_, __) => const SizedBox(width: 16),
+                  itemBuilder: (context, index) => _ShimmerFeaturedCard(),
+                ),
+              ),
             )
           else if (_featuredProducts.isEmpty)
             const Padding(
@@ -93,7 +116,7 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
             )
           else
             Container(
-              height: 280,
+              height: 420,
               margin: const EdgeInsets.symmetric(horizontal: 24),
               child: Stack(
                 children: [
@@ -234,6 +257,48 @@ class FeaturedProduct {
   }
 }
 
+class _ShimmerFeaturedCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 260,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(height: 10, width: 70, color: const Color(0xFFE0E0E0)),
+                const SizedBox(height: 8),
+                Container(height: 13, color: const Color(0xFFE0E0E0)),
+                const SizedBox(height: 4),
+                Container(height: 13, width: 140, color: const Color(0xFFE0E0E0)),
+                const SizedBox(height: 10),
+                Container(height: 16, width: 90, color: const Color(0xFFE0E0E0)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class FeaturedProductCard extends StatefulWidget {
   final FeaturedProduct product;
 
@@ -246,12 +311,24 @@ class FeaturedProductCard extends StatefulWidget {
 class _FeaturedProductCardState extends State<FeaturedProductCard> {
   bool _isHovered = false;
 
+  void _openProductDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductDetailPage(product: widget.product.toProduct()),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
+      child: GestureDetector(
+        onTap: () => _openProductDetails(context),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         transform: Matrix4.identity()..scale(_isHovered ? 1.03 : 1.0),
         child: Container(
@@ -269,6 +346,37 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Product image
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _openProductDetails(context),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: AspectRatio(
+                    aspectRatio: 1.6,
+                    child: widget.product.imageUrl.isNotEmpty
+                        ? Image.network(
+                            widget.product.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: const Color(0xFFF5F5F5),
+                              child: const Icon(Icons.music_note, size: 36, color: Colors.grey),
+                            ),
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return Container(
+                                color: const Color(0xFFF5F5F5),
+                                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              );
+                            },
+                          )
+                        : Container(
+                            color: const Color(0xFFF5F5F5),
+                            child: const Icon(Icons.music_note, size: 36, color: Colors.grey),
+                          ),
+                  ),
+                ),
+              ),
               // Product details
               Expanded(
                 child: Padding(
@@ -328,7 +436,7 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
                       Row(
                         children: [
                           Text(
-                            '₵${widget.product.price.toStringAsFixed(0)}',
+                            'GH₵${widget.product.price.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -338,7 +446,7 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              '₵${widget.product.originalPrice.toStringAsFixed(0)}',
+                              'GH₵${widget.product.originalPrice.toStringAsFixed(0)}',
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -392,6 +500,7 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

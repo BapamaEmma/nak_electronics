@@ -82,10 +82,10 @@ export default function FeaturedForm({ item, onClose }) {
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Sale Price (₵) *">
+            <Field label="Sale Price (GH₵) *">
               <input name="price" type="number" min="0" step="0.01" value={form.price} onChange={set} required placeholder="0.00" className={inp} />
             </Field>
-            <Field label="Original Price (₵)">
+            <Field label="Original Price (GH₵)">
               <input name="originalPrice" type="number" min="0" step="0.01" value={form.originalPrice} onChange={set} placeholder="0.00" className={inp} />
             </Field>
           </div>

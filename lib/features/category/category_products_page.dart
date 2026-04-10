@@ -206,6 +206,15 @@ class _ProductCard extends StatefulWidget {
 class _ProductCardState extends State<_ProductCard> {
   bool _isHovered = false;
 
+  void _openProductDetails(BuildContext context, Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductDetailPage(product: product),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -246,15 +255,19 @@ class _ProductCardState extends State<_ProductCard> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: ProductImage(
-                        imagePath: product.image,
-                        fit: BoxFit.cover,
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _openProductDetails(context, product),
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: ProductImage(
+                          imagePath: product.image,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
@@ -375,7 +388,7 @@ class _ProductCardState extends State<_ProductCard> {
                       Row(
                         children: [
                           Text(
-                            '₵${product.discountedPrice.toStringAsFixed(2)}',
+                            'GH₵${product.discountedPrice.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -385,7 +398,7 @@ class _ProductCardState extends State<_ProductCard> {
                           if (product.discount != null) ...[
                             const SizedBox(width: 6),
                             Text(
-                              '₵${product.price.toStringAsFixed(2)}',
+                              'GH₵${product.price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -395,32 +408,56 @@ class _ProductCardState extends State<_ProductCard> {
                           ],
                         ],
                       ),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: product.inStock
+                              ? const Color(0xFFE8F5E9)
+                              : const Color(0xFFFFEBEE),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          product.inStock ? 'In Stock' : 'Out of Stock',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: product.inStock
+                                ? const Color(0xFF2E7D32)
+                                : const Color(0xFFC62828),
+                          ),
+                        ),
+                      ),
                       const Spacer(),
                       SizedBox(
                         width: double.infinity,
                         height: 32,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.redAccent),
-                            foregroundColor: Colors.redAccent,
+                            side: BorderSide(
+                              color: product.inStock ? Colors.redAccent : Colors.grey,
+                            ),
+                            foregroundColor: product.inStock ? Colors.redAccent : Colors.grey,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
-                          onPressed: () {
-                            cart.addToCart(product);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '${product.name} added to cart',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
-                          },
+                          onPressed: product.inStock
+                              ? () {
+                                  cart.addToCart(product);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '${product.name} added to cart',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      duration: const Duration(seconds: 1),
+                                    ),
+                                  );
+                                }
+                              : null,
                           icon: const Icon(Icons.shopping_bag_outlined, size: 16),
                           label: const Text(
                             'Add to Cart',

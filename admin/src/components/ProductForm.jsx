@@ -37,6 +37,7 @@ const emptyForm = {
   stock: '',
   description: '',
   image: '',
+  images: [],
   isNew: false,
 }
 
@@ -56,6 +57,7 @@ export default function ProductForm({ product, onClose }) {
           stock: product.stock ?? '',
           description: product.description ?? '',
           image: product.image ?? '',
+          images: product.images ?? [],
           isNew: product.isNew ?? false,
         }
       : emptyForm,
@@ -92,6 +94,7 @@ export default function ProductForm({ product, onClose }) {
         stock: form.stock.trim(),
         description: form.description.trim(),
         image: form.image.trim(),
+        images: form.images.map((u) => u.trim()).filter(Boolean),
         isNew: form.isNew,
         updatedAt: serverTimestamp(),
       }
@@ -197,7 +200,7 @@ export default function ProductForm({ product, onClose }) {
 
           {/* Row 3: Price + Discount */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Price (₵) *">
+            <Field label="Price (GH₵) *">
               <input
                 name="price"
                 type="number"
@@ -251,7 +254,7 @@ export default function ProductForm({ product, onClose }) {
           </div>
 
           {/* Image URL */}
-          <Field label="Image URL — optional">
+          <Field label="Main Image URL — optional">
             <input
               name="image"
               type="url"
@@ -260,6 +263,41 @@ export default function ProductForm({ product, onClose }) {
               placeholder="https://..."
               className={inputCls}
             />
+          </Field>
+
+          {/* Additional Images */}
+          <Field label="Additional Image URLs (for gallery)">
+            <div className="flex flex-col gap-2">
+              {form.images.map((url, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => {
+                      const updated = [...form.images]
+                      updated[i] = e.target.value
+                      setForm((prev) => ({ ...prev, images: updated }))
+                    }}
+                    placeholder="https://..."
+                    className={`${inputCls} flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                    className="text-red-500 hover:text-red-700 font-bold px-2"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, images: [...prev.images, ''] }))}
+                className="text-sm text-blue-600 hover:underline text-left"
+              >
+                + Add image URL
+              </button>
+            </div>
           </Field>
 
           {/* Description */}

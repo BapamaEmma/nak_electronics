@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:nak_electronics/core/services/product_service.dart';
 import 'package:nak_electronics/models/product.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
@@ -26,6 +27,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
   bool _isLoading = true;
   String? _errorMessage;
   StreamSubscription<List<Product>>? _productsSubscription;
+  DateTime? _loadingStart;
 
   @override
   void initState() {
@@ -41,6 +43,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
 
   void _subscribeToProducts() {
     _productsSubscription?.cancel();
+    _loadingStart = DateTime.now();
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -48,10 +51,15 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
     _productsSubscription = ProductService.getAllProductsStream().listen(
       (products) {
         if (kDebugMode) print('ExploreProducts: Loaded ${products.length} products');
-        setState(() {
-          _allProducts = products;
-          _isLoading = false;
-        });
+        final elapsed = DateTime.now().difference(_loadingStart!).inMilliseconds;
+        final remaining = 1500 - elapsed;
+        if (remaining > 0) {
+          Future.delayed(Duration(milliseconds: remaining), () {
+            if (mounted) setState(() { _allProducts = products; _isLoading = false; });
+          });
+        } else {
+          setState(() { _allProducts = products; _isLoading = false; });
+        }
       },
       onError: (e, stack) {
         if (kDebugMode) print('ExploreProducts: Error: $e');
@@ -143,27 +151,78 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 24),
+          if (_isLoading)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Shimmer.fromColors(
+                baseColor: const Color(0xFFE0E0E0),
+                highlightColor: Colors.white,
+                period: const Duration(milliseconds: 2500),
+                child: Column(
+                  children: [
+                    // Filter row skeleton
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE0E0E0),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE0E0E0),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE0E0E0),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Product grid skeleton
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        childAspectRatio: 0.72,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: 8,
+                      itemBuilder: (context, index) => _ShimmerProductCard(),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
                 _buildFiltersRow(),
                 const SizedBox(height: 24),
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 80),
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text(
-                          'Loading products...',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                else if (_errorMessage != null)
+                if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 40),
                     child: Column(
@@ -420,7 +479,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
           itemCount: products.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            childAspectRatio: 1.4,
+            childAspectRatio: 0.72,
             crossAxisSpacing: 16,
             mainAxisSpacing: 20,
           ),
@@ -444,6 +503,60 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
   }
 }
 
+class _ShimmerProductCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image placeholder
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              ),
+            ),
+          ),
+          // Text placeholders
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 10, width: 60, color: const Color(0xFFE0E0E0)),
+                  const SizedBox(height: 8),
+                  Container(height: 12, color: const Color(0xFFE0E0E0)),
+                  const SizedBox(height: 4),
+                  Container(height: 12, width: 100, color: const Color(0xFFE0E0E0)),
+                  const SizedBox(height: 10),
+                  Container(height: 14, width: 70, color: const Color(0xFFE0E0E0)),
+                  const Spacer(),
+                  Container(
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE0E0E0),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ProductGridCard extends StatefulWidget {
   final Product product;
 
@@ -455,6 +568,15 @@ class _ProductGridCard extends StatefulWidget {
 
 class _ProductGridCardState extends State<_ProductGridCard> {
   bool _isHovered = false;
+
+  void _openProductDetails(BuildContext context, Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductDetailPage(product: product),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -481,6 +603,37 @@ class _ProductGridCardState extends State<_ProductGridCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Product image
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _openProductDetails(context, product),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: AspectRatio(
+                  aspectRatio: 1.2,
+                  child: product.image.isNotEmpty
+                      ? Image.network(
+                          product.image,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: const Color(0xFFF5F5F5),
+                            child: const Icon(Icons.music_note, size: 40, color: Colors.grey),
+                          ),
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return Container(
+                              color: const Color(0xFFF5F5F5),
+                              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: const Color(0xFFF5F5F5),
+                          child: const Icon(Icons.music_note, size: 40, color: Colors.grey),
+                        ),
+                ),
+              ),
+            ),
             // Details
             Expanded(
               child: Padding(
@@ -511,7 +664,7 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                     Row(
                       children: [
                         Text(
-                          '₵${product.discountedPrice.toStringAsFixed(2)}',
+                          'GH₵${product.discountedPrice.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -521,7 +674,7 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                         if (product.discount != null) ...[
                           const SizedBox(width: 6),
                           Text(
-                            '₵${product.price.toStringAsFixed(2)}',
+                            'GH₵${product.price.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -531,32 +684,56 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                         ],
                       ],
                     ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: product.inStock
+                            ? const Color(0xFFE8F5E9)
+                            : const Color(0xFFFFEBEE),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        product.inStock ? 'In Stock' : 'Out of Stock',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: product.inStock
+                              ? const Color(0xFF2E7D32)
+                              : const Color(0xFFC62828),
+                        ),
+                      ),
+                    ),
                     const Spacer(),
                     SizedBox(
                       width: double.infinity,
                       height: 32,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.redAccent),
-                          foregroundColor: Colors.redAccent,
+                          side: BorderSide(
+                            color: product.inStock ? Colors.redAccent : Colors.grey,
+                          ),
+                          foregroundColor: product.inStock ? Colors.redAccent : Colors.grey,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                         ),
-                        onPressed: () {
-                          cart.addToCart(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${product.name} added to cart',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
+                        onPressed: product.inStock
+                            ? () {
+                                cart.addToCart(product);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${product.name} added to cart',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            : null,
                         icon: const Icon(Icons.shopping_bag_outlined, size: 16),
                         label: const Text(
                           'Add to Cart',

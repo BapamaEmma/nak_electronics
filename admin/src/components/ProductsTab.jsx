@@ -141,7 +141,7 @@ export default function ProductsTab() {
                     <td className="px-6 py-4 text-gray-600">{product.brand}</td>
                     <td className="px-6 py-4 text-gray-600">{product.category}</td>
                     <td className="px-6 py-4 font-semibold text-gray-900">
-                      ₵{Number(product.price || 0).toFixed(2)}
+                      GH₵{Number(product.price || 0).toFixed(2)}
                       {product.discount > 0 && (
                         <span className="ml-2 text-xs text-orange-500 font-normal">
                           -{Math.round(product.discount * 100)}%

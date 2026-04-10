@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nak_electronics/models/product.dart';
 import 'package:nak_electronics/core/utils/image_widget.dart';
+import 'package:nak_electronics/features/product/product_detail_page.dart';
 
 class NewArrivalsSection extends StatefulWidget {
   const NewArrivalsSection({super.key});
@@ -253,6 +254,12 @@ class _NewArrivalsSectionState extends State<NewArrivalsSection> {
                               width: 220,
                               child: ProductCard(
                                 product: product,
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ProductDetailPage(product: product),
+                                  ),
+                                ),
                               ),
                             ),
                           );
@@ -371,6 +378,10 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   bool _isHovered = false;
 
+  void _openProductDetails() {
+    widget.onTap?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -401,22 +412,26 @@ class _ProductCardState extends State<ProductCard> {
                   flex: 3,
                   child: Stack(
                     children: [
-                      Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _openProductDetails,
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
                           ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                          child: ProductImage(
-                            imagePath: widget.product.image,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            child: ProductImage(
+                              imagePath: widget.product.image,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
                           ),
                         ),
                       ),
@@ -473,11 +488,31 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '₵${widget.product.discountedPrice.toStringAsFixed(0)}',
+                          'GH₵${widget.product.discountedPrice.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: Colors.red,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: widget.product.inStock
+                                ? const Color(0xFFE8F5E9)
+                                : const Color(0xFFFFEBEE),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            widget.product.inStock ? 'In Stock' : 'Out of Stock',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: widget.product.inStock
+                                  ? const Color(0xFF2E7D32)
+                                  : const Color(0xFFC62828),
+                            ),
                           ),
                         ),
                       ],

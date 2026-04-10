@@ -15,6 +15,13 @@ class ProductImage extends StatelessWidget {
     this.fit = BoxFit.cover,
   });
 
+  int? _cacheDimension(double? value) {
+    if (value == null || !value.isFinite || value <= 0) {
+      return null;
+    }
+    return value.toInt();
+  }
+
   bool get _isNetworkImage {
     return imagePath.startsWith('http://') || imagePath.startsWith('https://');
   }
@@ -145,9 +152,9 @@ class ProductImage extends StatelessWidget {
             ),
           );
         },
-        // Add cache settings for better performance
-        cacheWidth: width?.toInt(),
-        cacheHeight: height?.toInt(),
+        // Only use cache dimensions when they are finite numbers.
+        cacheWidth: _cacheDimension(width),
+        cacheHeight: _cacheDimension(height),
       );
     } else {
       return Image.asset(

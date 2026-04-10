@@ -90,8 +90,8 @@ export default function FeaturedTab() {
                         <p className="font-medium text-gray-900">{item.name}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">₵{Number(item.price || 0).toFixed(2)}</td>
-                    <td className="px-6 py-4 text-gray-500 line-through">₵{Number(item.originalPrice || 0).toFixed(2)}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">GH₵{Number(item.price || 0).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-gray-500 line-through">GH₵{Number(item.originalPrice || 0).toFixed(2)}</td>
                     <td className="px-6 py-4 text-gray-600">⭐ {item.rating} ({item.reviewCount})</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${item.isBestSeller ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'}`}>

@@ -18,6 +18,7 @@ class Product {
   final String? colours;
   final String? style;
   final String? itemNumber;
+  final List<String> images;
 
   Product({
     required this.id,
@@ -35,6 +36,7 @@ class Product {
     this.colours,
     this.style,
     this.itemNumber,
+    this.images = const [],
   });
   
   // Helper getter to check if product is in stock
@@ -56,6 +58,16 @@ class Product {
   double get discountedPrice =>
       discount != null ? price * (1 - discount!) : price;
 
+  /// All images to show in the gallery. Falls back to the single [image] field.
+  List<String> get allImages {
+    final list = <String>[];
+    if (image.isNotEmpty) list.add(image);
+    for (final img in images) {
+      if (img.isNotEmpty && !list.contains(img)) list.add(img);
+    }
+    return list;
+  }
+
   factory Product.fromFirestore(DocumentSnapshot doc) {
     final raw = doc.data();
     final data = (raw is Map<String, dynamic>) ? raw : <String, dynamic>{};
@@ -75,6 +87,10 @@ class Product {
       colours: data['colours']?.toString(),
       style: data['style']?.toString(),
       itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
+      images: (data['images'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .where((s) => s.isNotEmpty)
+          .toList() ?? [],
     );
   }
 
@@ -95,6 +111,10 @@ class Product {
       colours: data['colours']?.toString(),
       style: data['style']?.toString(),
       itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
+      images: (data['images'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .where((s) => s.isNotEmpty)
+          .toList() ?? [],
     );
   }
 

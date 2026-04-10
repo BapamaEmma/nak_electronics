@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BrandsSection extends StatefulWidget {
@@ -13,10 +14,12 @@ class _BrandsSectionState extends State<BrandsSection> {
   List<Map<String, dynamic>> _brands = [];
   bool _isLoading = true;
   StreamSubscription? _subscription;
+  DateTime? _loadingStart;
 
   @override
   void initState() {
     super.initState();
+    _loadingStart = DateTime.now();
     _subscription = FirebaseFirestore.instance
         .collection('brands')
         .orderBy('order')
@@ -27,8 +30,16 @@ class _BrandsSectionState extends State<BrandsSection> {
           _brands = snap.docs
               .map((d) => {'name': d['name'], 'logoUrl': d['logoUrl']})
               .toList();
-          _isLoading = false;
         });
+        final elapsed = DateTime.now().difference(_loadingStart!).inMilliseconds;
+        final remaining = 1500 - elapsed;
+        if (remaining > 0) {
+          Future.delayed(Duration(milliseconds: remaining), () {
+            if (mounted) setState(() { _isLoading = false; });
+          });
+        } else {
+          setState(() { _isLoading = false; });
+        }
       },
       onError: (_) => setState(() => _isLoading = false),
     );
@@ -55,9 +66,22 @@ class _BrandsSectionState extends State<BrandsSection> {
         ),
         const SizedBox(height: 32),
         if (_isLoading)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: CircularProgressIndicator(),
+          Shimmer.fromColors(
+            baseColor: const Color(0xFFE0E0E0),
+            highlightColor: Colors.white,
+            period: const Duration(milliseconds: 2500),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 6,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1,
+                children: List.generate(12, (_) => _ShimmerBrandCard()),
+              ),
+            ),
           )
         else if (_brands.isEmpty)
           const Padding(
@@ -123,6 +147,27 @@ class _BrandsSectionState extends State<BrandsSection> {
             ),
           ),
         const SizedBox(height: 48),
+      ],
+    );
+  }
+}
+
+class _ShimmerBrandCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFFE0E0E0),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(height: 10, width: 60, color: const Color(0xFFE0E0E0)),
       ],
     );
   }
