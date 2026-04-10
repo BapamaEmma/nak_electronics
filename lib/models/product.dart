@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String id;
   final String name;
@@ -53,6 +55,28 @@ class Product {
 
   double get discountedPrice =>
       discount != null ? price * (1 - discount!) : price;
+
+  factory Product.fromFirestore(DocumentSnapshot doc) {
+    final raw = doc.data();
+    final data = (raw is Map<String, dynamic>) ? raw : <String, dynamic>{};
+    return Product(
+      id: doc.id,
+      name: data['name']?.toString() ?? '',
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,
+      image: data['image']?.toString() ?? '',
+      category: data['category']?.toString() ?? '',
+      brand: data['brand']?.toString() ?? '',
+      description: data['description']?.toString() ?? '',
+      isNew: data['isNew'] == true,
+      discount: (data['discount'] as num?)?.toDouble(),
+      type: data['type']?.toString() ?? 'Instrument',
+      availability: data['availability']?.toString(),
+      stock: data['stock']?.toString(),
+      colours: data['colours']?.toString(),
+      style: data['style']?.toString(),
+      itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
+    );
+  }
 
   factory Product.fromMap(Map<String, dynamic> data, String id) {
     return Product(

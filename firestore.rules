@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Products collection:
+    //   - Anyone can READ (Flutter website loads products publicly)
+    //   - Only authenticated admin users can WRITE (create/update/delete)
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+  }
+}
