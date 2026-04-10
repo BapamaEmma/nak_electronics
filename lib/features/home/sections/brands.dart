@@ -1,22 +1,44 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BrandsSection extends StatelessWidget {
+class BrandsSection extends StatefulWidget {
   const BrandsSection({super.key});
 
-  final List<Map<String, dynamic>> _brandLogos = const [
-    {'name': 'Ibanez', 'path': 'assets/images/ibanez.png'},
-    {'name': 'Fender', 'path': 'assets/images/fender.png'},
-    {'name': 'Gibson', 'path': 'assets/images/gibson.png'},
-    {'name': 'Yamaha', 'path': 'assets/images/yamaha.png'},
-    {'name': 'EV', 'path': 'assets/images/ev.png'},
-    {'name': 'JBL', 'path': 'assets/images/jbl.png'},
-    {'name': 'Pearl', 'path': 'assets/images/pearl.png'},
-    {'name': 'TAMA', 'path': 'assets/images/tama.png'},
-    {'name': 'MG Series', 'path': 'assets/images/mg_series.png'},
-    {'name': 'Shure', 'path': 'assets/images/shure.png'},
-    {'name': 'Line Arrays', 'path': 'assets/images/line_arrays.png'},
-    {'name': 'Light', 'path': 'assets/images/light.png'},
-  ];
+  @override
+  State<BrandsSection> createState() => _BrandsSectionState();
+}
+
+class _BrandsSectionState extends State<BrandsSection> {
+  List<Map<String, dynamic>> _brands = [];
+  bool _isLoading = true;
+  StreamSubscription? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = FirebaseFirestore.instance
+        .collection('brands')
+        .orderBy('order')
+        .snapshots()
+        .listen(
+      (snap) {
+        setState(() {
+          _brands = snap.docs
+              .map((d) => {'name': d['name'], 'logoUrl': d['logoUrl']})
+              .toList();
+          _isLoading = false;
+        });
+      },
+      onError: (_) => setState(() => _isLoading = false),
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +54,27 @@ class BrandsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 6,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: _brandLogos.map((brand) {
-              return GestureDetector(
-                onTap: null,
-                child: Column(
+        if (_isLoading)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: CircularProgressIndicator(),
+          )
+        else if (_brands.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Text('No brands yet.', style: TextStyle(color: Colors.grey)),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 6,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              children: _brands.map((brand) {
+                return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
@@ -64,8 +95,8 @@ class BrandsSection extends StatelessWidget {
                           ),
                           padding: const EdgeInsets.all(8),
                           child: ClipOval(
-                            child: Image.asset(
-                              brand['path'],
+                            child: Image.network(
+                              brand['logoUrl'] ?? '',
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.music_note),
@@ -76,7 +107,7 @@ class BrandsSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      brand['name'],
+                      brand['name'] ?? '',
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -87,13 +118,10 @@ class BrandsSection extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
-        ),
-        const SizedBox(height: 48),
-
         const SizedBox(height: 48),
       ],
     );

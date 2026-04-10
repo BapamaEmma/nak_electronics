@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
-  collection,
-  addDoc,
+  setDoc,
   updateDoc,
   doc,
   serverTimestamp,
@@ -27,6 +26,7 @@ const CATEGORIES = [
 const AVAILABILITY_OPTIONS = ['In Stock', 'Out of Stock', 'Low Stock']
 
 const emptyForm = {
+  id: '',
   name: '',
   brand: '',
   category: 'Guitars',
@@ -45,6 +45,7 @@ export default function ProductForm({ product, onClose }) {
   const [form, setForm] = useState(
     isEdit
       ? {
+          id: product.id ?? '',
           name: product.name ?? '',
           brand: product.brand ?? '',
           category: product.category ?? 'Guitars',
@@ -69,6 +70,10 @@ export default function ProductForm({ product, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!isEdit && !form.id.trim()) {
+      setError('Product ID is required.')
+      return
+    }
     if (!form.name.trim() || !form.brand.trim() || form.price === '') {
       setError('Product name, brand, and price are required.')
       return
@@ -94,7 +99,7 @@ export default function ProductForm({ product, onClose }) {
       if (isEdit) {
         await updateDoc(doc(db, 'products', product.id), payload)
       } else {
-        await addDoc(collection(db, 'products'), {
+        await setDoc(doc(db, 'products', form.id.trim()), {
           ...payload,
           createdAt: serverTimestamp(),
         })
@@ -134,6 +139,20 @@ export default function ProductForm({ product, onClose }) {
               ⚠️ {error}
             </div>
           )}
+
+          {/* Product ID */}
+          <Field label="Product ID *">
+            <input
+              name="id"
+              value={form.id}
+              onChange={set}
+              required={!isEdit}
+              disabled={isEdit}
+              placeholder="e.g. fender-strat-sunburst"
+              className={`${inputCls} ${isEdit ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''}`}
+            />
+            {!isEdit && <p className="mt-1 text-xs text-gray-400">Unique ID — cannot be changed after saving. Use lowercase letters, numbers, and hyphens.</p>}
+          </Field>
 
           {/* Row 1: Name + Brand */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

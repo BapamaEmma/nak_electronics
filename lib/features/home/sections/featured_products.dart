@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/models/product.dart';
 
@@ -13,69 +15,32 @@ class FeaturedProductsSection extends StatefulWidget {
 
 class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
   final ScrollController _scrollController = ScrollController();
+  List<FeaturedProduct> _featuredProducts = [];
+  bool _isLoading = true;
+  StreamSubscription? _subscription;
 
-  final List<FeaturedProduct> _featuredProducts = [
-    FeaturedProduct(
-      id: '1',
-      name: 'Professional Studio Headphones',
-      price: 450.00,
-      originalPrice: 550.00,
-      imagePath: 'assets/images/headphone.png',
-      rating: 4.8,
-      reviewCount: 124,
-      isBestSeller: true,
-    ),
-    FeaturedProduct(
-      id: '2',
-      name: 'Electric Guitar Amplifier 50W',
-      price: 1200.00,
-      originalPrice: 1400.00,
-      imagePath: 'assets/images/electricguitar.png',
-      rating: 4.6,
-      reviewCount: 89,
-      isBestSeller: false,
-    ),
-    FeaturedProduct(
-      id: '3',
-      name: 'Professional Condenser Microphone',
-      price: 320.00,
-      originalPrice: 380.00,
-      imagePath: 'assets/images/condenser.png',
-      rating: 4.9,
-      reviewCount: 156,
-      isBestSeller: true,
-    ),
-    FeaturedProduct(
-      id: '4',
-      name: 'Digital Audio Interface',
-      price: 680.00,
-      originalPrice: 800.00,
-      imagePath: 'assets/images/card.png',
-      rating: 4.7,
-      reviewCount: 73,
-      isBestSeller: false,
-    ),
-    FeaturedProduct(
-      id: '5',
-      name: 'Acoustic Guitar Premium',
-      price: 1800.00,
-      originalPrice: 2200.00,
-      imagePath: 'assets/images/acoustic.png',
-      rating: 4.8,
-      reviewCount: 92,
-      isBestSeller: true,
-    ),
-    FeaturedProduct(
-      id: '6',
-      name: 'Tama Drum kit',
-      price: 2500.00,
-      originalPrice: 3000.00,
-      imagePath: 'assets/images/Tamadrum.png',
-      rating: 4.5,
-      reviewCount: 67,
-      isBestSeller: false,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _subscription = FirebaseFirestore.instance
+        .collection('featured_products')
+        .orderBy('order')
+        .snapshots()
+        .listen((snap) {
+      setState(() {
+        _featuredProducts =
+            snap.docs.map(FeaturedProduct.fromFirestore).toList();
+        _isLoading = false;
+      });
+    }, onError: (_) => setState(() => _isLoading = false));
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _scrollLeft() {
     _scrollController.animateTo(
@@ -91,12 +56,6 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
@@ -119,84 +78,98 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
             style: TextStyle(fontSize: 18, color: Colors.grey),
           ),
           const SizedBox(height: 32),
-          Container(
-            height: 280,
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            child: Stack(
-              children: [
-                ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                  itemCount: _featuredProducts.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 280,
-                      margin: const EdgeInsets.only(right: 20),
-                      child: FeaturedProductCard(
-                        product: _featuredProducts[index],
-                      ),
-                    );
-                  },
-                ),
-                // Left arrow
-                Positioned(
-                  left: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, size: 20),
-                        onPressed: _scrollLeft,
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: CircularProgressIndicator(),
+            )
+          else if (_featuredProducts.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Text(
+                'No featured products yet.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            )
+          else
+            Container(
+              height: 280,
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              child: Stack(
+                children: [
+                  ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 60),
+                    itemCount: _featuredProducts.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 280,
+                        margin: const EdgeInsets.only(right: 20),
+                        child: FeaturedProductCard(
+                          product: _featuredProducts[index],
+                        ),
+                      );
+                    },
+                  ),
+                  // Left arrow
+                  Positioned(
+                    left: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios, size: 20),
+                          onPressed: _scrollLeft,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // Right arrow
-                Positioned(
-                  right: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_forward_ios, size: 20),
-                        onPressed: _scrollRight,
+                  // Right arrow
+                  Positioned(
+                    right: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_forward_ios, size: 20),
+                          onPressed: _scrollRight,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: 32),
         ],
       ),
@@ -209,30 +182,48 @@ class FeaturedProduct {
   final String name;
   final double price;
   final double originalPrice;
-  final String imagePath;
+  final String imageUrl;
   final double rating;
   final int reviewCount;
   final bool isBestSeller;
+  final int order;
 
   FeaturedProduct({
     required this.id,
     required this.name,
     required this.price,
     required this.originalPrice,
-    required this.imagePath,
+    required this.imageUrl,
     required this.rating,
     required this.reviewCount,
     required this.isBestSeller,
+    required this.order,
   });
 
-  /// Converts FeaturedProduct to Product for cart functionality
+  factory FeaturedProduct.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return FeaturedProduct(
+      id: doc.id,
+      name: data['name']?.toString() ?? '',
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,
+      originalPrice: (data['originalPrice'] as num?)?.toDouble() ?? 0.0,
+      imageUrl: data['imageUrl']?.toString() ?? '',
+      rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+      isBestSeller: data['isBestSeller'] == true,
+      order: (data['order'] as num?)?.toInt() ?? 0,
+    );
+  }
+
   Product toProduct() {
-    final discount = (originalPrice - price) / originalPrice;
+    final discount = originalPrice > 0
+        ? (originalPrice - price) / originalPrice
+        : 0.0;
     return Product(
       id: id,
       name: name,
       price: originalPrice,
-      image: imagePath,
+      image: imageUrl,
       category: 'Featured',
       brand: 'Premium',
       description: 'Featured product with $rating star rating',

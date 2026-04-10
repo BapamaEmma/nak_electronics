@@ -6,7 +6,7 @@ import 'package:nak_electronics/features/home/sections/categories.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/features/home/sections/brands.dart';
 import 'package:nak_electronics/features/home/sections/new_arrivals.dart';
-import 'package:nak_electronics/features/home/sections/featured_products.dart';
+import 'package:nak_electronics/features/home/sections/featured_products.dart' show FeaturedProductsSection;
 import 'package:nak_electronics/features/home/sections/special_deals.dart';
 import 'package:nak_electronics/features/home/sections/explore_products.dart';
 import 'package:nak_electronics/features/home/sections/cart_drawer.dart';
