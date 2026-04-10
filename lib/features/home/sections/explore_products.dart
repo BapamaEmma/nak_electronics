@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nak_electronics/core/services/product_service.dart';
@@ -20,40 +21,46 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
   String _searchQuery = '';
   String _selectedCategory = 'All';
   String _selectedSort = 'Popular';
-  int _itemsToShow = 12; // Initial number of products to display
-  static const int _itemsPerPage = 12; // Products to load per "Load More" click
+  int _itemsToShow = 12;
+  static const int _itemsPerPage = 12;
   bool _isLoading = true;
   String? _errorMessage;
+  StreamSubscription<List<Product>>? _productsSubscription;
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+    _subscribeToProducts();
   }
 
-  Future<void> _loadProducts() async {
+  @override
+  void dispose() {
+    _productsSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeToProducts() {
+    _productsSubscription?.cancel();
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-
-    try {
-      final products = await ProductService.getAllProducts();
-      print('ExploreProducts: Loaded ${products.length} products');
-      for (var product in products) {
-        print('ExploreProducts: Product: ${product.name}, Image: ${product.image}');
-      }
-      setState(() {
-        _allProducts = products;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('ExploreProducts: Error loading products: $e');
-      setState(() {
-        _errorMessage = 'Failed to load products. Please try again.';
-        _isLoading = false;
-      });
-    }
+    _productsSubscription = ProductService.getAllProductsStream().listen(
+      (products) {
+        if (kDebugMode) print('ExploreProducts: Loaded ${products.length} products');
+        setState(() {
+          _allProducts = products;
+          _isLoading = false;
+        });
+      },
+      onError: (e, stack) {
+        if (kDebugMode) print('ExploreProducts: Error: $e');
+        setState(() {
+          _errorMessage = 'Error: $e';
+          _isLoading = false;
+        });
+      },
+    );
   }
 
   List<String> get _categories {
@@ -167,18 +174,26 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: _loadProducts,
+                          onPressed: _subscribeToProducts,
                           child: const Text('Retry'),
                         ),
                       ],
                     ),
                   )
                 else if (allFilteredProducts.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Text(
-                      'No products found. Try changing your filters.',
-                      style: TextStyle(color: Colors.grey),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'No products found.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          'Total loaded from Firestore: ${_allProducts.length}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
                     ),
                   )
                 else ...[

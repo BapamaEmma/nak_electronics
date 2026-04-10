@@ -200,11 +200,8 @@ class TestimonialCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 25,
-                backgroundImage: AssetImage(testimonial.avatar),
-                onBackgroundImageError: (exception, stackTrace) {},
-                child: testimonial.avatar.isEmpty
-                    ? const Icon(Icons.person, size: 30)
-                    : null,
+                backgroundColor: const Color(0xFFFF8B8B),
+                child: const Icon(Icons.person, size: 30, color: Colors.white),
               ),
               const SizedBox(width: 16),
               Column(

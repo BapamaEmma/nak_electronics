@@ -12,6 +12,7 @@ class Product {
   
   // Additional fields
   final String? availability;
+  final String? stock;
   final String? colours;
   final String? style;
   final String? itemNumber;
@@ -28,6 +29,7 @@ class Product {
     this.discount,
     this.type = 'Instrument',
     this.availability,
+    this.stock,
     this.colours,
     this.style,
     this.itemNumber,
@@ -52,7 +54,25 @@ class Product {
   double get discountedPrice =>
       discount != null ? price * (1 - discount!) : price;
 
-
+  factory Product.fromMap(Map<String, dynamic> data, String id) {
+    return Product(
+      id: id,
+      name: data['name']?.toString() ?? '',
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,
+      image: data['image']?.toString() ?? '',
+      category: data['category']?.toString() ?? '',
+      brand: data['brand']?.toString() ?? '',
+      description: data['description']?.toString() ?? '',
+      isNew: data['isNew'] == true,
+      discount: (data['discount'] as num?)?.toDouble(),
+      type: data['type']?.toString() ?? 'Instrument',
+      availability: data['availability']?.toString(),
+      stock: data['stock']?.toString(),
+      colours: data['colours']?.toString(),
+      style: data['style']?.toString(),
+      itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
+    );
+  }
 
   // Convert Product to Map
   Map<String, dynamic> toMap() {
@@ -64,6 +84,7 @@ class Product {
       'category': category,
       'description': description,
       'availability': availability ?? 'In stock',
+      'stock': stock,
       'colours': colours,
       'style': style,
       'itemNumber': itemNumber,

@@ -1116,16 +1116,16 @@ class _NavMenuItemState extends State<_NavMenuItem>
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Text(
                 widget.title,
                 key: _textKey,
-                style: TextStyle(
-                  fontSize: 18,
+                style: const TextStyle(
+                  fontSize: 15,
                   color: Colors.black87,
                   fontWeight: FontWeight.normal,
                   fontFamily: 'Poppins',
@@ -1138,7 +1138,9 @@ class _NavMenuItemState extends State<_NavMenuItem>
                   animation: _widthAnimation,
                   builder: (context, child) {
                     final renderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
-                    final textWidth = renderBox?.size.width ?? 0;
+                    final textWidth = (renderBox != null && renderBox.hasSize)
+                        ? renderBox.size.width
+                        : 0.0;
                     return Container(
                       height: 1.5,
                       width: textWidth * _widthAnimation.value,
