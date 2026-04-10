@@ -6,7 +6,7 @@ import 'package:nak_electronics/models/product.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nak_electronics/features/product/product_detail_page.dart';
-import 'package:nak_electronics/core/utils/image_widget.dart';
+
 
 /// SHEIN-style explore section: search, filters, and a responsive product grid.
 class ExploreProductsSection extends StatefulWidget {
@@ -420,7 +420,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
           itemCount: products.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            childAspectRatio: 0.70,
+            childAspectRatio: 1.4,
             crossAxisSpacing: 16,
             mainAxisSpacing: 20,
           ),
@@ -460,13 +460,6 @@ class _ProductGridCardState extends State<_ProductGridCard> {
   Widget build(BuildContext context) {
     final product = widget.product;
     final cart = Provider.of<CartService>(context, listen: false);
-    
-    // Debug: Print product image info
-    if (kDebugMode) {
-      print('_ProductGridCard: Building card for ${product.name}');
-      print('_ProductGridCard: Image path: ${product.image}');
-      print('_ProductGridCard: Image is empty: ${product.image.isEmpty}');
-    }
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -488,113 +481,8 @@ class _ProductGridCardState extends State<_ProductGridCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image + badges
-            Expanded(
-              flex: 3,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: ProductImage(
-                        imagePath: product.image,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  if (product.isNew)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'NEW',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (product.discount != null)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '-${(product.discount! * 100).round()}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  // Stock status badge
-                  if (product.availability != null)
-                    Positioned(
-                      bottom: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: product.inStock 
-                              ? Colors.green.withOpacity(0.9)
-                              : Colors.red.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              product.inStock ? Icons.check_circle : Icons.cancel,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              product.stockStatus,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
             // Details
             Expanded(
-              flex: 2,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

@@ -120,7 +120,7 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
           ),
           const SizedBox(height: 32),
           Container(
-            height: 480,
+            height: 280,
             margin: const EdgeInsets.symmetric(horizontal: 24),
             child: Stack(
               children: [
@@ -257,12 +257,6 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    final discountPercentage =
-        ((widget.product.originalPrice - widget.product.price) /
-                widget.product.originalPrice *
-                100)
-            .round();
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -284,90 +278,8 @@ class _FeaturedProductCardState extends State<FeaturedProductCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product image with badges
-              Expanded(
-                flex: 3,
-                child: Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(16),
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
-                        ),
-                        child: Image.asset(
-                          widget.product.imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                color: Colors.grey[200],
-                                child: const Icon(
-                                  Icons.music_note,
-                                  size: 64,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                        ),
-                      ),
-                    ),
-                    // Best Seller badge
-                    if (widget.product.isBestSeller)
-                      Positioned(
-                        top: 12,
-                        left: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            'BEST SELLER',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    // Discount badge
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '-$discountPercentage%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               // Product details
               Expanded(
-                flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
