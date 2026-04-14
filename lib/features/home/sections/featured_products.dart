@@ -34,10 +34,12 @@ class _FeaturedProductsSectionState extends State<FeaturedProductsSection> {
       final elapsed = DateTime.now().difference(_loadingStart!).inMilliseconds;
       final remaining = 1500 - elapsed;
       void applyData() {
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _featuredProducts = snap.docs.map(FeaturedProduct.fromFirestore).toList();
           _isLoading = false;
         });
+        }
       }
       if (remaining > 0) {
         Future.delayed(Duration(milliseconds: remaining), applyData);
