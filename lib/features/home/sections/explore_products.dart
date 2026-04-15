@@ -8,7 +8,6 @@ import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nak_electronics/features/product/product_detail_page.dart';
 
-
 /// SHEIN-style explore section: search, filters, and a responsive product grid.
 class ExploreProductsSection extends StatefulWidget {
   const ExploreProductsSection({super.key});
@@ -50,15 +49,25 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
     });
     _productsSubscription = ProductService.getAllProductsStream().listen(
       (products) {
-        if (kDebugMode) print('ExploreProducts: Loaded ${products.length} products');
-        final elapsed = DateTime.now().difference(_loadingStart!).inMilliseconds;
+        if (kDebugMode)
+          print('ExploreProducts: Loaded ${products.length} products');
+        final elapsed = DateTime.now()
+            .difference(_loadingStart!)
+            .inMilliseconds;
         final remaining = 1500 - elapsed;
         if (remaining > 0) {
           Future.delayed(Duration(milliseconds: remaining), () {
-            if (mounted) setState(() { _allProducts = products; _isLoading = false; });
+            if (mounted)
+              setState(() {
+                _allProducts = products;
+                _isLoading = false;
+              });
           });
         } else {
-          setState(() { _allProducts = products; _isLoading = false; });
+          setState(() {
+            _allProducts = products;
+            _isLoading = false;
+          });
         }
       },
       onError: (e, stack) {
@@ -83,8 +92,9 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
     Iterable<Product> products = _allProducts;
 
     if (_selectedCategory != 'All') {
-      products =
-          products.where((p) => p.category.toLowerCase() == _selectedCategory.toLowerCase());
+      products = products.where(
+        (p) => p.category.toLowerCase() == _selectedCategory.toLowerCase(),
+      );
     }
 
     if (_searchQuery.isNotEmpty) {
@@ -140,10 +150,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
         children: [
           const Text(
             'Explore Products',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -202,12 +209,13 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.72,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            childAspectRatio: 0.72,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                          ),
                       itemCount: 8,
                       itemBuilder: (context, index) => _ShimmerProductCard(),
                     ),
@@ -216,66 +224,69 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
               ),
             )
           else
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              children: [
-                _buildFiltersRow(),
-                const SizedBox(height: 24),
-                if (_errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40),
-                    child: Column(
-                      children: [
-                        Text(
-                          _errorMessage!,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _subscribeToProducts,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
-                else if (allFilteredProducts.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'No products found.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        Text(
-                          'Total loaded from Firestore: ${_allProducts.length}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                else ...[
-                  _buildGrid(productsToShow),
-                  if (hasMore) ...[
-                    const SizedBox(height: 32),
-                    _buildLoadMoreButton(allFilteredProducts.length),
-                  ],
-                  if (!hasMore && allFilteredProducts.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      'Showing all ${allFilteredProducts.length} products',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                        fontStyle: FontStyle.italic,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                children: [
+                  _buildFiltersRow(),
+                  const SizedBox(height: 24),
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Column(
+                        children: [
+                          Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _subscribeToProducts,
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
-                    ),
+                    )
+                  else if (allFilteredProducts.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'No products found.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          Text(
+                            'Total loaded from Firestore: ${_allProducts.length}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    _buildGrid(productsToShow),
+                    if (hasMore) ...[
+                      const SizedBox(height: 32),
+                      _buildLoadMoreButton(allFilteredProducts.length),
+                    ],
+                    if (!hasMore && allFilteredProducts.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Showing all ${allFilteredProducts.length} products',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ],
                 ],
-              ],
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -340,7 +351,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
           // Search field
           Expanded(
             flex: 3,
-              child: TextField(
+            child: TextField(
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
@@ -376,10 +387,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
                   value: _selectedCategory,
                   icon: const Icon(Icons.keyboard_arrow_down),
                   items: _categories
-                      .map((c) => DropdownMenuItem(
-                            value: c,
-                            child: Text(c),
-                          ))
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
@@ -408,17 +416,15 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
                 child: DropdownButton<String>(
                   value: _selectedSort,
                   icon: const Icon(Icons.sort),
-                  items: const [
-                    'Popular',
-                    'Price: Low to High',
-                    'Price: High to Low',
-                    'New Arrivals',
-                  ].map((s) {
-                    return DropdownMenuItem(
-                      value: s,
-                      child: Text(s),
-                    );
-                  }).toList(),
+                  items:
+                      const [
+                        'Popular',
+                        'Price: Low to High',
+                        'Price: High to Low',
+                        'New Arrivals',
+                      ].map((s) {
+                        return DropdownMenuItem(value: s, child: Text(s));
+                      }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
@@ -446,9 +452,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
           );
         }
 
-        return Row(
-          children: children,
-        );
+        return Row(children: children);
       },
     );
   }
@@ -466,7 +470,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = 4;
+        int crossAxisCount = 5;
         if (constraints.maxWidth < 600) {
           crossAxisCount = 2;
         } else if (constraints.maxWidth < 1000) {
@@ -479,7 +483,7 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
           itemCount: products.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            childAspectRatio: 0.72,
+            childAspectRatio: 0.60,
             crossAxisSpacing: 16,
             mainAxisSpacing: 20,
           ),
@@ -532,13 +536,25 @@ class _ShimmerProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(height: 10, width: 60, color: const Color(0xFFE0E0E0)),
+                  Container(
+                    height: 10,
+                    width: 60,
+                    color: const Color(0xFFE0E0E0),
+                  ),
                   const SizedBox(height: 8),
                   Container(height: 12, color: const Color(0xFFE0E0E0)),
                   const SizedBox(height: 4),
-                  Container(height: 12, width: 100, color: const Color(0xFFE0E0E0)),
+                  Container(
+                    height: 12,
+                    width: 100,
+                    color: const Color(0xFFE0E0E0),
+                  ),
                   const SizedBox(height: 10),
-                  Container(height: 14, width: 70, color: const Color(0xFFE0E0E0)),
+                  Container(
+                    height: 14,
+                    width: 70,
+                    color: const Color(0xFFE0E0E0),
+                  ),
                   const Spacer(),
                   Container(
                     height: 34,
@@ -572,9 +588,7 @@ class _ProductGridCardState extends State<_ProductGridCard> {
   void _openProductDetails(BuildContext context, Product product) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProductDetailPage(product: product),
-      ),
+      MaterialPageRoute(builder: (_) => ProductDetailPage(product: product)),
     );
   }
 
@@ -608,28 +622,43 @@ class _ProductGridCardState extends State<_ProductGridCard> {
               behavior: HitTestBehavior.opaque,
               onTap: () => _openProductDetails(context, product),
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: AspectRatio(
-                  aspectRatio: 1.2,
+                  aspectRatio: 1.0,
                   child: product.image.isNotEmpty
                       ? Image.network(
                           product.image,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: const Color(0xFFF5F5F5),
-                            child: const Icon(Icons.music_note, size: 40, color: Colors.grey),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: const Color(0xFFF5F5F5),
+                                child: const Icon(
+                                  Icons.music_note,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                              ),
                           loadingBuilder: (context, child, progress) {
                             if (progress == null) return child;
                             return Container(
                               color: const Color(0xFFF5F5F5),
-                              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
                             );
                           },
                         )
                       : Container(
                           color: const Color(0xFFF5F5F5),
-                          child: const Icon(Icons.music_note, size: 40, color: Colors.grey),
+                          child: const Icon(
+                            Icons.music_note,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
                         ),
                 ),
               ),
@@ -637,8 +666,10 @@ class _ProductGridCardState extends State<_ProductGridCard> {
             // Details
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -686,7 +717,10 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: product.inStock
                             ? const Color(0xFFE8F5E9)
@@ -711,9 +745,13 @@ class _ProductGridCardState extends State<_ProductGridCard> {
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: product.inStock ? Colors.redAccent : Colors.grey,
+                            color: product.inStock
+                                ? Colors.redAccent
+                                : Colors.grey,
                           ),
-                          foregroundColor: product.inStock ? Colors.redAccent : Colors.grey,
+                          foregroundColor: product.inStock
+                              ? Colors.redAccent
+                              : Colors.grey,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -751,4 +789,3 @@ class _ProductGridCardState extends State<_ProductGridCard> {
     );
   }
 }
-

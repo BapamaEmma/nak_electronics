@@ -39,6 +39,7 @@ const emptyForm = {
   image: '',
   images: [],
   isNew: false,
+  colorVariants: [],
 }
 
 export default function ProductForm({ product, onClose }) {
@@ -59,6 +60,7 @@ export default function ProductForm({ product, onClose }) {
           image: product.image ?? '',
           images: product.images ?? [],
           isNew: product.isNew ?? false,
+          colorVariants: product.colorVariants ?? [],
         }
       : emptyForm,
   )
@@ -96,6 +98,7 @@ export default function ProductForm({ product, onClose }) {
         image: form.image.trim(),
         images: form.images.map((u) => u.trim()).filter(Boolean),
         isNew: form.isNew,
+        colorVariants: form.colorVariants.filter((v) => v.name.trim()),
         updatedAt: serverTimestamp(),
       }
 
@@ -296,6 +299,83 @@ export default function ProductForm({ product, onClose }) {
                 className="text-sm text-blue-600 hover:underline text-left"
               >
                 + Add image URL
+              </button>
+            </div>
+          </Field>
+
+          {/* Color Variants */}
+          <Field label="Colour Variants (name + hex colour + image per colour)">
+            <div className="flex flex-col gap-3">
+              {form.colorVariants.map((variant, i) => (
+                <div key={i} className="flex gap-2 items-start flex-wrap border border-gray-200 rounded-xl p-3">
+                  {/* Colour swatch preview */}
+                  <div
+                    className="w-8 h-8 rounded-full border border-gray-300 shrink-0 mt-1"
+                    style={{ backgroundColor: variant.hex || '#cccccc' }}
+                  />
+                  <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
+                    <input
+                      type="text"
+                      value={variant.name}
+                      onChange={(e) => {
+                        const updated = [...form.colorVariants]
+                        updated[i] = { ...updated[i], name: e.target.value }
+                        setForm((prev) => ({ ...prev, colorVariants: updated }))
+                      }}
+                      placeholder="Colour name (e.g. Wooden Brown)"
+                      className={inputCls}
+                    />
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="color"
+                        value={variant.hex || '#000000'}
+                        onChange={(e) => {
+                          const updated = [...form.colorVariants]
+                          updated[i] = { ...updated[i], hex: e.target.value }
+                          setForm((prev) => ({ ...prev, colorVariants: updated }))
+                        }}
+                        className="w-10 h-9 rounded cursor-pointer border border-gray-300"
+                        title="Pick colour"
+                      />
+                      <input
+                        type="text"
+                        value={variant.hex || ''}
+                        onChange={(e) => {
+                          const updated = [...form.colorVariants]
+                          updated[i] = { ...updated[i], hex: e.target.value }
+                          setForm((prev) => ({ ...prev, colorVariants: updated }))
+                        }}
+                        placeholder="#8B4513"
+                        className={`${inputCls} flex-1`}
+                      />
+                    </div>
+                    <input
+                      type="url"
+                      value={variant.image || ''}
+                      onChange={(e) => {
+                        const updated = [...form.colorVariants]
+                        updated[i] = { ...updated[i], image: e.target.value }
+                        setForm((prev) => ({ ...prev, colorVariants: updated }))
+                      }}
+                      placeholder="Image URL for this colour (https://...)"
+                      className={inputCls}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, colorVariants: prev.colorVariants.filter((_, idx) => idx !== i) }))}
+                    className="text-red-500 hover:text-red-700 font-bold px-2 mt-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, colorVariants: [...prev.colorVariants, { name: '', hex: '#000000', image: '' }] }))}
+                className="text-sm text-blue-600 hover:underline text-left"
+              >
+                + Add colour variant
               </button>
             </div>
           </Field>

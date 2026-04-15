@@ -11,13 +11,13 @@ class FooterSection extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+            children: [
               // Top: brand + columns
-          LayoutBuilder(
-            builder: (context, constraints) {
+              LayoutBuilder(
+                builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 900;
 
                   final brandColumn = Expanded(
@@ -27,72 +27,52 @@ class FooterSection extends StatelessWidget {
                       children: [
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                              width: 56,
-                              height: 56,
-                                    decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                                    ),
-                                    child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                      child: Image.asset(
-                                  'assets/images/logo.PNG',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Text(
-                                    'Naknaa Electronics',
-                                    style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                letterSpacing: 0.2,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          children: [
+                            Image.asset(
+                              'assets/images/liftapp.png',
+                              width: 260,
+                              height: 140,
+                              fit: BoxFit.contain,
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 12),
-                              const Text(
+                        const Text(
                           'Premium instruments, sound and lighting gear for studios,\nchurches, events and creators across Ghana.',
-                                style: TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                                  color: Colors.white70,
-                                  height: 1.5,
-                                ),
-                              ),
+                            color: Colors.white70,
+                            height: 1.5,
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         Row(
                           children: [
                             _SocialIcon.image('assets/images/Watup.png', () {}),
-                            _SocialIcon.image('assets/images/youtube.png', () {}),
-                            _SocialIcon.image('assets/images/TikTok.png', () {}),
+                            _SocialIcon.image(
+                              'assets/images/youtube.png',
+                              () {},
+                            ),
+                            _SocialIcon.image(
+                              'assets/images/TikTok.png',
+                              () {},
+                            ),
                           ],
                         ),
-                            ],
-                          ),
+                      ],
+                    ),
                   );
 
                   final shopColumn = Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
                           'Shop',
-                                style: TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -107,15 +87,15 @@ class FooterSection extends StatelessWidget {
                   );
 
                   final helpColumn = Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
                           'Help',
-                                style: TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -129,34 +109,34 @@ class FooterSection extends StatelessWidget {
                   );
 
                   final contactColumn = Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
                           'Visit us',
-                                style: TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
+                            color: Colors.white,
+                          ),
+                        ),
                         SizedBox(height: 12),
-                              _ContactItem(
+                        _ContactItem(
                           Icons.location_on_outlined,
-                                'Accra, Ghana\nEast Legon, ARS Building',
-                              ),
+                          'Accra, Ghana\nEast Legon, ARS Building',
+                        ),
                         SizedBox(height: 10),
-                              _ContactItem(
+                        _ContactItem(
                           Icons.phone_in_talk_outlined,
-                                '+233 24 123 4567\n+233 20 987 6543',
-                              ),
+                          '+233 24 123 4567\n+233 20 987 6543',
+                        ),
                         SizedBox(height: 10),
-                              _ContactItem(
+                        _ContactItem(
                           Icons.email_outlined,
                           'info@naknaaelectronics.com',
-                              ),
+                        ),
                         SizedBox(height: 10),
-                              _ContactItem(
+                        _ContactItem(
                           Icons.schedule_outlined,
                           'Mon – Sat: 7:00 am – 5:00 pm',
                         ),
@@ -189,28 +169,23 @@ class FooterSection extends StatelessWidget {
                       helpColumn,
                       const SizedBox(height: 24),
                       contactColumn,
-                      ],
-                    );
-            },
-          ),
+                    ],
+                  );
+                },
+              ),
               const SizedBox(height: 28),
               // Thin divider
-              Container(
-                height: 1,
-                color: Colors.white24,
-              ),
+              Container(height: 1, color: Colors.white24),
               const SizedBox(height: 18),
               // Bottom bar: copyright + policies + payments
-          LayoutBuilder(
-            builder: (context, constraints) {
+              LayoutBuilder(
+                builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 800;
 
-                  final copyrightText =
-                      const Text('© 2024 Naknaa Electronics. All rights reserved.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                          ));
+                  final copyrightText = const Text(
+                    '© 2024 Naknaa Electronics. All rights reserved.',
+                    style: TextStyle(fontSize: 12, color: Colors.white70),
+                  );
 
                   final policyRow = Row(
                     mainAxisSize: MainAxisSize.min,
@@ -250,19 +225,19 @@ class FooterSection extends StatelessWidget {
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                    children: [
                       copyrightText,
                       const SizedBox(height: 8),
                       policyRow,
-                const SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       paymentsRow,
                     ],
                   );
                 },
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
@@ -291,9 +266,7 @@ class _SocialIconState extends State<_SocialIcon> {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.08),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white24,
-            ),
+            border: Border.all(color: Colors.white24),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(999),
@@ -383,11 +356,7 @@ class _PaymentImageIcon extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Image.asset(
-        assetPath,
-        height: 24,
-        fit: BoxFit.contain,
-      ),
+      child: Image.asset(assetPath, height: 24, fit: BoxFit.contain),
     );
   }
 }

@@ -6,7 +6,8 @@ import 'package:nak_electronics/features/home/sections/categories.dart';
 import 'package:nak_electronics/core/services/cart_service.dart';
 import 'package:nak_electronics/features/home/sections/brands.dart';
 import 'package:nak_electronics/features/home/sections/new_arrivals.dart';
-import 'package:nak_electronics/features/home/sections/featured_products.dart' show FeaturedProductsSection;
+import 'package:nak_electronics/features/home/sections/featured_products.dart'
+    show FeaturedProductsSection;
 import 'package:nak_electronics/features/home/sections/special_deals.dart';
 import 'package:nak_electronics/features/home/sections/explore_products.dart';
 import 'package:nak_electronics/features/home/sections/cart_drawer.dart';
@@ -148,7 +149,7 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
           // Pass a callback to the appbar so nav menu items can request scrolling
           SizedBox(
             width: 1600,
-            height: 70,
+            height: 100,
             child: _CustomAppBar(
               onItemSelected: (title) {
                 switch (title) {
@@ -369,10 +370,10 @@ class _NaknaaHomePageState extends State<NaknaaHomePage>
                       ),
                     ),
                   ),
-              // SHEIN-style explore / catalog section
-              Container(
-                key: _exploreKey,
-                child: const ExploreProductsSection(),
+                  // SHEIN-style explore / catalog section
+                  Container(
+                    key: _exploreKey,
+                    child: const ExploreProductsSection(),
                   ),
                   // Categories section (keyed)
                   Container(
@@ -423,13 +424,14 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onSearchTap,
   });
   @override
-  Size get preferredSize => const Size.fromHeight(20);
+  Size get preferredSize => const Size.fromHeight(100);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 70,
+      height: 100,
+      clipBehavior: Clip.hardEdge,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white70,
@@ -450,28 +452,22 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Row(
             children: [
               const _ModernHamburgerButton(),
-              const SizedBox(width: 24),
-          Padding(
-            padding: const EdgeInsets.only(left: 4, right: 8),
-            child: SizedBox(
-              width: 60,
-              height: 70,
-              child: Center(
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 220,
+                height: 95,
                 child: Image.asset(
-                  'assets/images/logo.PNG',
+                  'assets/images/liftapp.png',
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
                 ),
               ),
-            ),
-          ),
             ],
           ),
           // Center: navigation menu
           Expanded(
-            child: Center(
-              child: _NavMenu(onItemSelected: onItemSelected),
-            ),
+            child: Center(child: _NavMenu(onItemSelected: onItemSelected)),
           ),
           // Right: search, wishlist, cart + auth buttons
           Row(
@@ -481,8 +477,10 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               TextButton.icon(
                 onPressed: onSearchTap,
                 style: TextButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.grey[800],
                   shape: RoundedRectangleBorder(
@@ -492,19 +490,13 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 icon: const Icon(Icons.search, size: 18),
                 label: const Text(
                   'Search products',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                  ),
+                  style: TextStyle(fontSize: 12, fontFamily: 'Poppins'),
                 ),
               ),
               const SizedBox(width: 8),
               // Wishlist icon (placeholder)
               IconButton(
-                icon: const Icon(
-                  Icons.favorite_border,
-                  color: Colors.black87,
-                ),
+                icon: const Icon(Icons.favorite_border, color: Colors.black87),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -529,74 +521,78 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                           Scaffold.of(context).openEndDrawer();
                         },
                       ),
-                if (cart.totalQuantity > 0)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      width: 18,
-                      height: 18,
-                      decoration: const BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          cart.totalQuantity.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                      if (cart.totalQuantity > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: const BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                cart.totalQuantity.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                    ],
                   ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+                ),
               ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              elevation: 0,
-            ),
-            onPressed: () {},
-            child: const Text(
-              'SignUp',
-              style: TextStyle(fontFamily: 'Poppins'),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(right: 16, left: 6),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () {},
+                  child: const Text(
+                    'SignUp',
+                    style: TextStyle(fontFamily: 'Poppins'),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 16, left: 6),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF8B8B),
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              elevation: 0,
-            ),
-            onPressed: () {},
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () {},
                   child: const Text(
                     'Login',
                     style: TextStyle(fontFamily: 'Poppins'),
                   ),
-          ),
-        ),
-      ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -621,8 +617,8 @@ class _ModernHamburgerButtonState extends State<_ModernHamburgerButton> {
     final bgColor = _isPressed
         ? Colors.black.withOpacity(0.20)
         : _isHovered
-            ? Colors.black.withOpacity(0.12)
-            : Colors.black.withOpacity(0.06);
+        ? Colors.black.withOpacity(0.12)
+        : Colors.black.withOpacity(0.06);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -724,10 +720,7 @@ class _NavMenu extends StatelessWidget {
       _NavMenuItem('About Us', onTap: () => onItemSelected('About Us')),
     ];
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: navItems,
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: navItems);
   }
 }
 
@@ -742,58 +735,34 @@ class _MainSideMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DrawerHeader(
+            Container(
               margin: EdgeInsets.zero,
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFFF8B8B),
-                    Color(0xFFB83B3B),
-                  ],
+                  colors: [Color(0xFFFF8B8B), Color(0xFFB83B3B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 64,
-                        height: 64,
-                        child: Image.asset(
-                          'assets/images/logo.PNG',
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.music_note, color: Colors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          'Naknaa Electronics',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                          ),
-                        ),
-                      ),
-                    ],
+                  Center(
+                    child: Image.asset(
+                      'assets/images/liftapp.png',
+                      height: 130,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.music_note, color: Colors.white),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
                     'Shop premium instruments, sound, lighting\nand studio gear in one place.',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
@@ -935,26 +904,25 @@ class _DrawerItem extends StatelessWidget {
               child: Image.asset(
                 imagePath!,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                errorBuilder: (context, error, stackTrace) =>
+                    const SizedBox.shrink(),
               ),
             )
           : ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
-                colors: [
-                  Color(0xFFFF4B5C),
-                  Color(0xFFFF6B8B),
-                ],
+                colors: [Color(0xFFFF4B5C), Color(0xFFFF6B8B)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ).createShader(bounds),
-              child: Icon(icon ?? Icons.error_outline, size: 26, color: Colors.white),
+              child: Icon(
+                icon ?? Icons.error_outline,
+                size: 26,
+                color: Colors.white,
+              ),
             ),
       title: Text(
         label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontFamily: 'Poppins',
-        ),
+        style: const TextStyle(fontSize: 14, fontFamily: 'Poppins'),
       ),
       onTap: () {
         Navigator.of(context).maybePop();
@@ -962,9 +930,8 @@ class _DrawerItem extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CategoryProductsPage(
-                categoryName: categoryName!,
-              ),
+              builder: (context) =>
+                  CategoryProductsPage(categoryName: categoryName!),
             ),
           );
         }
@@ -1013,12 +980,7 @@ class _CategoriesMegaMenu extends StatelessWidget {
             ..._categories.map(
               (c) => PopupMenuItem<String>(
                 value: c,
-                child: Text(
-                  c,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                  ),
-                ),
+                child: Text(c, style: const TextStyle(fontFamily: 'Poppins')),
               ),
             ),
           ];
@@ -1028,9 +990,8 @@ class _CategoriesMegaMenu extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CategoryProductsPage(
-                categoryName: category,
-              ),
+              builder: (context) =>
+                  CategoryProductsPage(categoryName: category),
             ),
           );
         },
@@ -1047,11 +1008,7 @@ class _CategoriesMegaMenu extends StatelessWidget {
               ),
             ),
             SizedBox(width: 4),
-            Icon(
-              Icons.keyboard_arrow_down,
-              color: Colors.white,
-              size: 18,
-            ),
+            Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
           ],
         ),
       ),
@@ -1085,10 +1042,7 @@ class _NavMenuItemState extends State<_NavMenuItem>
       reverseDuration: const Duration(milliseconds: 250),
     );
     _widthAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOutCubic,
-      ),
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
     );
   }
 
@@ -1137,7 +1091,9 @@ class _NavMenuItemState extends State<_NavMenuItem>
                 child: AnimatedBuilder(
                   animation: _widthAnimation,
                   builder: (context, child) {
-                    final renderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
+                    final renderBox =
+                        _textKey.currentContext?.findRenderObject()
+                            as RenderBox?;
                     final textWidth = (renderBox != null && renderBox.hasSize)
                         ? renderBox.size.width
                         : 0.0;

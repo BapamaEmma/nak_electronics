@@ -1,5 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// A single colour variant for a product (e.g. "Wooden Brown" with its own image).
+class ColorVariant {
+  final String name;
+  final String hex; // e.g. "#8B4513"
+  final String image; // URL or empty string
+
+  const ColorVariant({required this.name, required this.hex, this.image = ''});
+
+  factory ColorVariant.fromMap(Map<String, dynamic> m) => ColorVariant(
+    name: m['name']?.toString() ?? '',
+    hex: m['hex']?.toString() ?? '#000000',
+    image: m['image']?.toString() ?? '',
+  );
+
+  Map<String, dynamic> toMap() => {'name': name, 'hex': hex, 'image': image};
+}
+
 class Product {
   final String id;
   final String name;
@@ -11,7 +28,7 @@ class Product {
   final bool isNew;
   final double? discount;
   final String type; // 'Instrument' or 'Accessory'
-  
+
   // Additional fields
   final String? availability;
   final String? stock;
@@ -19,6 +36,7 @@ class Product {
   final String? style;
   final String? itemNumber;
   final List<String> images;
+  final List<ColorVariant> colorVariants;
 
   Product({
     required this.id,
@@ -37,14 +55,15 @@ class Product {
     this.style,
     this.itemNumber,
     this.images = const [],
+    this.colorVariants = const [],
   });
-  
+
   // Helper getter to check if product is in stock
   bool get inStock {
     if (availability == null) return false;
     return availability!.toLowerCase().contains('in stock');
   }
-  
+
   // Helper getter for stock status text
   String get stockStatus {
     if (availability == null) return 'Unknown';
@@ -87,10 +106,18 @@ class Product {
       colours: data['colours']?.toString(),
       style: data['style']?.toString(),
       itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
-      images: (data['images'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .where((s) => s.isNotEmpty)
-          .toList() ?? [],
+      images:
+          (data['images'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .where((s) => s.isNotEmpty)
+              .toList() ??
+          [],
+      colorVariants:
+          (data['colorVariants'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map(ColorVariant.fromMap)
+              .toList() ??
+          [],
     );
   }
 
@@ -111,10 +138,18 @@ class Product {
       colours: data['colours']?.toString(),
       style: data['style']?.toString(),
       itemNumber: (data['itemNumber'] ?? data['item#'])?.toString(),
-      images: (data['images'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .where((s) => s.isNotEmpty)
-          .toList() ?? [],
+      images:
+          (data['images'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .where((s) => s.isNotEmpty)
+              .toList() ??
+          [],
+      colorVariants:
+          (data['colorVariants'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .map(ColorVariant.fromMap)
+              .toList() ??
+          [],
     );
   }
 
@@ -136,6 +171,7 @@ class Product {
       'discount': discount,
       'type': type,
       'brand': brand,
+      'colorVariants': colorVariants.map((v) => v.toMap()).toList(),
     };
   }
 }

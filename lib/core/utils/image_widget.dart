@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 
 /// Widget that displays images from either network URLs or local assets
 class ProductImage extends StatelessWidget {
@@ -46,11 +46,7 @@ class ProductImage extends StatelessWidget {
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.image_not_supported,
-              color: Colors.grey,
-              size: 40,
-            ),
+            Icon(Icons.image_not_supported, color: Colors.grey, size: 40),
             SizedBox(height: 8),
             Text(
               'No image',
@@ -104,11 +100,7 @@ class ProductImage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.broken_image,
-                  color: Colors.red,
-                  size: 48,
-                ),
+                const Icon(Icons.broken_image, color: Colors.red, size: 48),
                 const SizedBox(height: 8),
                 if (kDebugMode)
                   Padding(
@@ -116,14 +108,20 @@ class ProductImage extends StatelessWidget {
                     child: Text(
                       'Image failed to load',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 if (kDebugMode && imagePath.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      imagePath.length > 50 ? '${imagePath.substring(0, 50)}...' : imagePath,
+                      imagePath.length > 50
+                          ? '${imagePath.substring(0, 50)}...'
+                          : imagePath,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 10, color: Colors.grey),
                       maxLines: 2,
@@ -147,14 +145,14 @@ class ProductImage extends StatelessWidget {
             child: CircularProgressIndicator(
               value: loadingProgress.expectedTotalBytes != null
                   ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                        loadingProgress.expectedTotalBytes!
                   : null,
             ),
           );
         },
-        // Only use cache dimensions when they are finite numbers.
-        cacheWidth: _cacheDimension(width),
-        cacheHeight: _cacheDimension(height),
+        // cacheWidth/cacheHeight are not supported on Flutter Web and cause images to fail.
+        cacheWidth: kIsWeb ? null : _cacheDimension(width),
+        cacheHeight: kIsWeb ? null : _cacheDimension(height),
       );
     } else {
       return Image.asset(
@@ -169,11 +167,7 @@ class ProductImage extends StatelessWidget {
           return Container(
             color: Colors.grey[200],
             alignment: Alignment.center,
-            child: const Icon(
-              Icons.music_note,
-              color: Colors.grey,
-              size: 40,
-            ),
+            child: const Icon(Icons.music_note, color: Colors.grey, size: 40),
           );
         },
       );
