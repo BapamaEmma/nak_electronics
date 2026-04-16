@@ -49,19 +49,21 @@ class _ExploreProductsSectionState extends State<ExploreProductsSection> {
     });
     _productsSubscription = ProductService.getAllProductsStream().listen(
       (products) {
-        if (kDebugMode)
+        if (kDebugMode) {
           print('ExploreProducts: Loaded ${products.length} products');
+        }
         final elapsed = DateTime.now()
             .difference(_loadingStart!)
             .inMilliseconds;
         final remaining = 1500 - elapsed;
         if (remaining > 0) {
           Future.delayed(Duration(milliseconds: remaining), () {
-            if (mounted)
+            if (mounted) {
               setState(() {
                 _allProducts = products;
                 _isLoading = false;
               });
+            }
           });
         } else {
           setState(() {
